@@ -1,0 +1,9 @@
+*.css linguist-vendored
+*.html linguist-vendored
+*.js linguist-vendored
+*.jpg binary
+*.png binary
+*.gif binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
