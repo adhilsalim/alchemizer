@@ -1,7 +1,9 @@
 # Folders
-Test
-test
-spleeter
+Test/
+test/
+spleeter/
+pretrained_models/
+output/
 
 # Python
 __pycache__/

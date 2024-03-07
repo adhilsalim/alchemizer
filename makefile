@@ -1,30 +1,20 @@
-PHONY: setup-windows
-setup-windows:
+# create-venv: Create a virtual environment
+PHONY: create-venv
+create-venv:
 	pip install virtualenv
 	virtualenv -p "D:\Python\Python310\python.exe" venv
-	venv\Scripts\activate
-	pip install flask
+
+# setup: Install all dependencies
+PHONY: setup-spleeter
+setup-spleeter:
 	git clone https://github.com/deezer/spleeter.git
 	pip install pytest pytest-xdist
 	pip install musdb
 	pip install museval
-	cd spleeter
-	pip install .
-	cd ..
-	pip install -r requirements.txt
+	pip install ffmpeg
 
-PHONY: setup-linux
-setup-linux:
-	pip install virtualenv
-	virtualenv venv
-	source venv/bin/activate
-	pip install flask
-	pip install -r requirements.txt
+# SELF: cd spleeter
+# SELF: pip install .
+# SELF: cd ..
 
-PHONY: run-windows
-run-windows:
-	venv\Scripts\activate
-
-PHONY: run-linux
-run-linux:
-	source venv/bin/activate
+# pip install flask

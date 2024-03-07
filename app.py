@@ -1,49 +1,24 @@
-import os
-from flask import Flask, render_template, request
-import spleeter
+from flask import Flask, jsonify
+from spleeter.separator import Separator
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads/'  # Set the upload folder
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        # Check if a file was uploaded
-        if 'file' not in request.files:
-            return 'No file uploaded', 400
+@app.route('/')
+def home():
+  return jsonify({"message": "Hello, World!"})
 
-        file = request.files['file']
+@app.route('/separate')
+def separate_song():
+  # Define file paths
+  input_file = "test/satranga.mp3"
+  output_folder = "output"
 
-        # Save the uploaded file
-        if file.filename != '':
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-            file.save(file_path)
+  # Separate song using Spleeter
+  separator = Separator("spleeter:2stems")  # Separate into 2 stems
+  separator.separate(audio_path=input_file, destination=output_folder)
 
-            # Run Spleeter model on the uploaded file
-            spleeter_separate(file_path)
-
-            # Remove the uploaded file
-            os.remove(file_path)
-
-        return 'File uploaded and processed successfully'
-
-    return render_template('index.html')
-
-def spleeter_separate(file_path):
-    # Create an output directory
-    output_dir = 'output/'
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    # Run Spleeter
-    spleeter.separate_to_path(
-        file_path,
-        output_dir,
-        codec='mp3',
-        bitrate='128k',
-        softmask=True,
-        multiprocess=True
-    )
+  # Return success message
+  return jsonify({"message": "complete"})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+  app.run(debug=True)
