@@ -1,22 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>test</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Flask App</title>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Upload MP3 File</h1>
-        <form method="post" enctype="multipart/form-data">
-            <input type="file" name="file" id="fileInput" accept=".mp3" required>
-            <button type="submit" id="uploadBtn" disabled>Upload</button>
-        </form>
-    </div>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <h1>Welcome to the Flask App</h1>
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <label for="file">Select File (.mp3 or .wav):</label>
+        <input type="file" name="file" accept=".mp3,.wav" required>
+        <br>
+        <input type="submit" value="Upload">
+    </form>
 </body>
 
 </html>

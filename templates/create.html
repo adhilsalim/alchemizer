@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Create Page</title>
+    <script>
+        window.onload = function () {
+            const filePathInput = document.getElementById('filePathInput');
+            const filePathValue = filePathInput.value;
+            const stemContainer = document.getElementById('stemContainer');
+
+            fetch('/getStem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'file_path=' + encodeURIComponent(filePathValue)
+            })
+                .then(response => response.json())
+                .then(stems => {
+                    console.log('Stems:', stems);
+                    stems.forEach(stem => {
+                        const audioElement = document.createElement('audio');
+                        audioElement.controls = true;
+
+                        const sourceElement = document.createElement('source');
+                        sourceElement.src = stem.file_path;
+                        sourceElement.type = 'audio/wav';
+
+                        audioElement.appendChild(sourceElement);
+                        stemContainer.appendChild(audioElement);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Create Page</h1>
+    {% if file_path %}
+    <p>Selected file path: {{ file_path }}</p>
+    <input type="hidden" id="filePathInput" value="{{ file_path }}">
+    <audio controls>
+        <source src="{{ url_for('serve_audio', filename=file_path.split(os.path.sep)[-1]) }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div id="stemContainer"></div>
+    {% else %}
+    <p>No file selected.</p>
+    {% endif %}
+    <a href="{{ url_for('index') }}">Back to Home</a>
+</body>
+
+</html>
