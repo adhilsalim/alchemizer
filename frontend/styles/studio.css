@@ -1,0 +1,163 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+Khojki&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f6f3f3;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+h1 {
+  font-weight: bold;
+}
+
+.hero-section {
+  margin: 10px;
+  margin-top: 100px;
+  padding: 20px 0px 20px 0px;
+  background-color: #ffffff;
+  border-radius: 15px;
+}
+
+#welcome-title {
+  background: linear-gradient(to right, #8500ff 0%, #de00ff 30%);
+  background-clip: text; /* Standard property */
+  -webkit-background-clip: text; /* WebKit browsers */
+  color: transparent;
+  font-size: 4rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+#welcome-subtitle {
+  font-family: "Noto Sans Khojki", sans-serif;
+  font-weight: bold;
+  color: #404040;
+}
+
+#audio_main_title,
+#example_section_title {
+  font-family: "Noto Sans Khojki", sans-serif;
+  font-weight: bold;
+  color: #404040;
+}
+
+.audio-example-1,
+.audio-example-2 {
+  /* background-image: url("https://img.freepik.com/free-photo/vivid-blurred-colorful-background_58702-2655.jpg");
+  background-size: cover; */
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+  /* background-filter: blur(100px);
+  -webkit-background-filter: blur(100px); */
+}
+
+#audio_example_container_1,
+#audio_example_container_2 {
+  background: linear-gradient(
+    49deg,
+    #2d4de0 0,
+    #9f71f0 30%,
+    #fc6277 58%,
+    #f8ef6f 95%
+  );
+  border-radius: 15px;
+}
+
+#audio_example_container_1:hover .audio-example-1,
+#audio_example_container_2:hover .audio-example-2 {
+  border-radius: 15px;
+  transform: scale(1.05) translateY(10px);
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.1));
+  transition: transform 0.2s ease-in-out;
+}
+
+.audio-example-1:hover,
+.audio-example-2:hover {
+  cursor: pointer;
+}
+
+.audio-example-1 .card-title,
+.audio-example-2 .card-title {
+  font-family: "Noto Sans Khojki", sans-serif;
+  font-weight: 500;
+  color: #404040;
+}
+
+.audio-example-1 .material-symbols-outlined,
+.audio-example-2 .material-symbols-outlined {
+  background: linear-gradient(to right, #8500ff 0%, #de00ff 100%);
+  background-clip: text; /* Standard property */
+  -webkit-background-clip: text; /* WebKit browsers */
+  color: transparent;
+  font-size: 30px;
+}
+
+.main-section {
+  margin: 10px;
+  padding: 20px 0px 20px 0px;
+  background-color: #ffffff;
+  border-radius: 15px;
+}
+
+.main-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #8500ff;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  width: 15rem;
+}
+
+.light-green-bgcolor {
+  background-color: #00ffae;
+  color: #404040;
+}
+
+.light-green-color {
+  color: #00ffae;
+}
+
+.main-button:hover .main-button-icon {
+  transform: scale(0.9);
+  transition: transform 0.3s ease-in-out;
+}
+
+.main-button:hover {
+  background-color: #de00ff;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.main-button-text {
+  font-size: 16px;
+}
+
+.main-button-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.main-button-icon span {
+  color: #8500ff;
+}
+
+.main-button .material-icons {
+  color: #8500ff;
+  font-size: 24px;
+}

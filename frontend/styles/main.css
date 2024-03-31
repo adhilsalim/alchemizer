@@ -1,0 +1,336 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Khojki&display=swap");
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f6f3f3;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+:root {
+  --nav-home-background-color: rgb(209, 255, 183);
+  --nav-studio-background-color: rgb(183, 255, 250);
+  --nav-about-background-color: rgb(255, 183, 251);
+  --nav-contact-background-color: rgb(255, 239, 183);
+  --nav-default-background-color: rgba(255, 255, 255, 0.75);
+}
+
+.container {
+  margin-top: 50px;
+}
+
+h1 {
+  font-weight: bold;
+}
+
+nav {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-home-background-color {
+  background: rgba(208, 2, 27, 0.25);
+}
+
+.nav-container {
+  background: var(--nav-default-background-color);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(3.5px);
+  -webkit-backdrop-filter: blur(3.5px);
+  border-radius: 60px;
+  margin: 10px;
+  padding: 10px;
+  overflow: hidden;
+  position: fixed;
+  top: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: 1000;
+  width: auto;
+  height: 50px;
+  max-width: 140px;
+  -webkit-transition: max-width 0.5s;
+  transition: max-width 0.5s ease-in-out;
+}
+
+.nav-expand {
+  max-width: 400px;
+}
+
+.nav-title-container {
+  white-space: nowrap;
+  padding: 0px;
+  margin: 0px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.nav-title-container a {
+  text-decoration: none;
+  background: linear-gradient(to right, #8500ff 0%, #de00ff 100%);
+  background-clip: text; /* Standard property */
+  -webkit-background-clip: text; /* WebKit browsers */
+  color: transparent;
+  font-family: "Noto Sans Khojki", sans-serif;
+  font-weight: 700;
+  padding: 0px;
+  margin: 0px;
+}
+
+.nav-container:hover {
+  max-width: 400px;
+}
+
+.nav-list-container {
+  white-space: nowrap;
+  padding: 0px;
+  margin: 0px;
+}
+
+.nav-list {
+  padding: 0px;
+  margin: 0px;
+  margin-left: 20px;
+}
+
+.nav-list li {
+  list-style-type: none;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.nav-item:hover {
+  color: #484444;
+}
+
+/* hero section */
+.hero-main {
+  margin: 15px;
+  padding-top: 20px;
+  padding-bottom: 40px;
+  border-radius: 12px;
+  background-color: #ffffff;
+}
+
+.hero-title,
+.modal-title {
+  background: linear-gradient(to right, #8500ff 0%, #de00ff 60%);
+  background-clip: text; /* Standard property */
+  -webkit-background-clip: text; /* WebKit browsers */
+  color: transparent;
+  font-size: 4rem;
+}
+
+.hero-main p {
+  font-family: "Noto Sans Khojki", sans-serif;
+  color: #404040;
+}
+
+/* hero button OLD */
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+/* hero button NEW  and modal button*/
+.hero-button,
+.modal-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #8500ff;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  width: 15rem;
+}
+
+.light-green-bgcolor {
+  background-color: #00ffae;
+  color: #404040;
+}
+
+.light-green-color {
+  color: #00ffae;
+}
+
+.hero-button:hover .hero-button-icon,
+.modal-button:hover .modal-button-icon {
+  transform: scale(0.9);
+  transition: transform 0.3s ease-in-out;
+}
+
+.hero-button:hover,
+.modal-button:hover {
+  background-color: #de00ff;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.hero-button-text,
+.modal-button-text {
+  font-size: 16px;
+}
+
+.hero-button-icon,
+.modal-button-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-button-icon span,
+.modal-button-icon span {
+  color: #8500ff;
+}
+
+.hero-button .material-icons,
+.modal-button .material-icons {
+  color: #8500ff;
+  font-size: 24px;
+}
+
+/* Features section */
+
+.feature-section {
+  margin: 15px;
+  padding-top: 20px;
+  padding-bottom: 40px;
+  border-radius: 12px;
+  background-color: #ffffff;
+}
+
+.feature-section .card-text {
+  font-family: "Noto Sans Khojki", sans-serif;
+  color: #404040;
+}
+
+.feature-section-title {
+  font-family: "Noto Sans Khojki", sans-serif;
+  font-weight: bold;
+  color: #404040;
+}
+
+.feature-section-title span {
+  background: #8500ff;
+  background: linear-gradient(to right, #8500ff 0%, #de00ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.feature-section .card {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 20px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-section .card-img-top {
+  width: 100%;
+  padding: 20px;
+  height: auto;
+}
+
+.feature-section .card-title {
+  font-weight: bold;
+}
+
+/* final section */
+.final-main {
+  margin: 15px;
+  padding-top: 20px;
+  padding-bottom: 40px;
+  border-radius: 12px;
+}
+
+/* final title */
+.final-title {
+  color: #ffffff;
+  font-size: 4rem;
+}
+
+.final-title span {
+  background: linear-gradient(to right, #8500ff 0%, #de00ff 60%);
+  background-clip: text; /* Standard property */
+  -webkit-background-clip: text; /* WebKit browsers */
+  color: transparent;
+  font-size: 4rem;
+}
+
+/* final text */
+.final-main p {
+  font-family: "Noto Sans Khojki", sans-serif;
+  color: #404040;
+}
+
+/* final button */
+.final-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  color: #000000;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  width: 15rem;
+}
+
+.final-button:hover .final-button-icon {
+  transform: scale(0.9);
+  transition: transform 0.3s ease-in-out;
+}
+
+.final-button:hover {
+  background-color: #b0b0b0;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.final-button-text {
+  font-size: 16px;
+}
+
+.final-button-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.final-button-icon span {
+  color: #000000;
+}
+
+.final-button .material-icons {
+  color: #8500ff;
+  font-size: 24px;
+}
+
+.final-main img {
+  transform: rotateX("180deg");
+}
