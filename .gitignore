@@ -5,6 +5,9 @@ spleeter/
 pretrained_models/
 output/
 features/
+backend/flask/Include/
+backend/flask/Lib/
+backend/flask/Scripts/
 
 # Python
 __pycache__/
