@@ -8,6 +8,8 @@ backend/flask/Include/
 backend/flask/Lib/
 backend/flask/Scripts/
 backend/flask/uploads/
+backend/flask/share/
+backend/flask/spleeter_output/
 backend/spleeter/Include/
 backend/spleeter/Lib/
 backend/spleeter/Scripts/
