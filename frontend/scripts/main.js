@@ -85,6 +85,7 @@ uploadAudioButton.addEventListener("click", () => {
 function cacheFile(file) {
   if (file) {
     localStorage.setItem("upload_audio_cache", file);
+    console.log(localStorage.getItem("upload_audio_cache"), "cached.");
   } else {
     console.log("CRASH: No file selected.");
   }
