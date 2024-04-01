@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import os
+import subprocess
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes and origins
@@ -9,6 +10,15 @@ CORS(app)  # Enable CORS for all routes and origins
 # cors = CORS(app, resources={r"/*": {"origins": ["http://localhost:3000"]}})
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
+
+# Path to the Flask virtual environment
+flask_venv_path = r"E:\_ADHIL\___PROJECTS\GITHUB\adhilsalim-alchemizer\backend\flask"
+
+# Path to the Spleeter virtual environment
+spleeter_venv_path = r"E:\_ADHIL\___PROJECTS\GITHUB\adhilsalim-alchemizer\backend\spleeter"
+
+# Path to the Spleeter executable
+spleeter_bin = os.path.join(spleeter_venv_path, "Scripts", "spleeter")
 
 # Create upload folder if it doesn't exist
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -41,6 +51,27 @@ def load_audio():
             return send_file(file_path, as_attachment=True)
         else:
             return jsonify({'error': 'File not found'}), 404
+    else:
+        return jsonify({'error': 'No file name provided'}), 400
+
+@app.route('/separate-audio', methods=['GET'])
+def separate_audio():
+    filename = request.args.get('filename')
+    if filename:
+        file_path = os.path.join('uploads', filename)
+        output_dir = 'spleeter_output'
+        
+        # check whether the separated audio files already exist
+
+        # Construct the Spleeter command
+        command = [spleeter_bin, "separate", "-p", "spleeter:2stems", "-o", output_dir, file_path]
+
+        try:
+            # Run the Spleeter command
+            subprocess.run(command, check=True, cwd=flask_venv_path, env=os.environ.copy())
+            return jsonify({'message': 'Audio separation successful'})
+        except subprocess.CalledProcessError as e:
+            return jsonify({'error': str(e)}), 500
     else:
         return jsonify({'error': 'No file name provided'}), 400
 
