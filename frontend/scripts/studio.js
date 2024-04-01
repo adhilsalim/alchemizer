@@ -1,5 +1,22 @@
 console.clear();
 
+const audioExample = {
+  example_audio_1: {
+    fileName: "naan_yen.mp3",
+    title: "Naan Yen",
+    singers: "A.R. Rahman, Rayhanah",
+    description: "Coke Studio India Season 3: Episode 1.",
+    duration: "0:55",
+  },
+  example_audio_2: {
+    fileName: "tujo_mila_raabta.mp3",
+    title: "Tu Jo Mila Raabta",
+    singers: "Shirley Setia, Jubin Nautiyal",
+    description: "T-Series Mixtape Season 2.",
+    duration: "0:46",
+  },
+};
+
 //----------------- DOM Elements -----------------//
 const welcomeTitle = document.querySelector("#welcome-title");
 const welcomeSubtitle = document.querySelector("#welcome-subtitle");
@@ -68,5 +85,6 @@ function getUserName(method) {
 
 // ----------------- Load Audio Template ----------------- //
 function loadAudioTemplate(template) {
-  console.log("Loading audio template", template);
+  console.log(audioExample[template]);
+  loadSelectedAudio(audioExample[template].fileName);
 }
