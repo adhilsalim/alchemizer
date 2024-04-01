@@ -1,7 +1,6 @@
 console.clear();
 
 // ----------------- Global Variables -----------------//
-const separateAudioButton = document.getElementById("separate-audio");
 
 const audioExample = {
   example_audio_1: {
@@ -23,10 +22,12 @@ const audioExample = {
 //----------------- DOM Elements -----------------//
 const welcomeTitle = document.querySelector("#welcome-title");
 const welcomeSubtitle = document.querySelector("#welcome-subtitle");
-const MainAudioPlayer = document.querySelector("#main-audio-player");
+const separateAudioButton = document.getElementById("separate-audio");
+// const MainAudioPlayer = document.querySelector("#main-audio-player");
 const MainAudioPlayerContainer = document.querySelector(
   "#main-audio-player-container"
 );
+const mainAudioTitle = document.querySelector("#audio_main_title");
 
 // ----------------- Welcome Message ----------------- //
 welcomeTitle.textContent = `Hello, ${getUserName("first")}`;
@@ -72,24 +73,53 @@ separateAudioButton.addEventListener("click", () => {
 });
 
 // ----------------- Get Selected Audio ----------------- //
-function loadSelectedAudio(fileName) {
+async function loadSelectedAudio(fileName) {
   if (fileName) {
-    fetch(`http://localhost:5000/load-audio?filename=${fileName}`)
-      .then((response) => response.blob())
-      .then((blob) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/load-audio?filename=${fileName}`
+      );
+      if (response.ok) {
+        console.log("headers:", ...response.headers);
+        const blob = await response.blob();
         const audioUrl = URL.createObjectURL(blob);
-        MainAudioPlayerContainer.innerHTML = `<wave-audio-path-player src="${audioUrl}" wave-width="400" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' id="main-audio-player"></wave-audio-path-player>`;
+        MainAudioPlayerContainer.innerHTML = `<wave-audio-path-player src="${audioUrl}" wave-width="400" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' id="main-audio-player" title=""></wave-audio-path-player>`;
         console.log("Audio loaded:", audioUrl);
-      })
-      .catch((error) => {
-        console.error("Error loading audio:", error);
-      });
+        // set main audio title
+        (async () => {
+          let title = await getAudioTitle(fileName);
+          if (title === "Unknown") {
+            title = fileName.split(".")[0];
+          }
+          mainAudioTitle.innerHTML = title;
+        })();
+      } else {
+        throw new Error("Error loading audio");
+      }
+    } catch (error) {
+      console.error("Error loading audio:", error);
+    }
   } else {
     console.log("No audio found");
     alert("No audio found");
   }
 }
 
+// ----------------- Get Audio Title ----------------- //
+async function getAudioTitle(fileName) {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/get-audio-title?filename=${fileName}`
+    );
+    const data = await response.json();
+    console.log(data);
+    console.log("Audio Title:", data.title);
+    return data.title;
+  } catch (error) {
+    console.error("Error fetching audio title:", error);
+    return null;
+  }
+}
 // ----------------- Data URI to Blob ----------------- //
 function dataURItoBlob(dataURI) {
   const byteString = atob(dataURI.split(",")[1]);
