@@ -1,9 +1,12 @@
 console.clear();
 
+//----------------- Global Variables -----------------//
+let file = null;
+
 // ----------------- DOM Elements ----------------- //
 const selectAudioButton = document.getElementById("select-audio");
 const selectAudioButtonText = document.getElementById("select-audio-text");
-
+const uploadAudioButton = document.getElementById("upload-audio");
 const navbar = document.querySelector(".nav-container");
 const heroSection = document.querySelector(".hero-main");
 
@@ -40,12 +43,16 @@ observer.observe(heroSection);
 
 // ----------------- Audio Selection ----------------- //
 selectAudioButton.addEventListener("click", () => {
+  console.log("Inside click event");
+
   const input = document.createElement("input");
   input.type = "file";
   input.accept = ".mp3, .wav";
 
   input.onchange = (e) => {
-    const file = e.target.files[0];
+    console.log("Inside onchange event");
+
+    file = e.target.files[0];
     console.log(file);
     // const reader = new FileReader();
     // reader.readAsDataURL(file);
@@ -58,5 +65,30 @@ selectAudioButton.addEventListener("click", () => {
     selectAudioButton.classList.add("light-green-bgcolor");
   };
 
+  console.log("Out of onchange event");
+
   input.click();
+});
+
+// ----------------- Audio Upload ----------------- //
+uploadAudioButton.addEventListener("click", () => {
+  if (file) {
+    const formData = new FormData();
+    formData.append("audio", file);
+
+    fetch("http://localhost:5000/upload", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("File uploaded successfully", data);
+        window.location.href = `http://localhost:3000/studio/`;
+      })
+      .catch((error) => {
+        console.error("Error uploading file", error);
+      });
+  } else {
+    alert("Please select/record an audio file.");
+  }
 });
