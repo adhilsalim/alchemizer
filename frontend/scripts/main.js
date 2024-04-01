@@ -49,6 +49,7 @@ selectAudioButton.addEventListener("click", () => {
 
   input.onchange = (e) => {
     file = e.target.files[0];
+    cacheFile(file);
     selectAudioButtonText.textContent = "Selected";
     selectAudioButton.classList.add("light-green-bgcolor");
   };
@@ -79,3 +80,12 @@ uploadAudioButton.addEventListener("click", () => {
     alert("Please select/record an audio file.");
   }
 });
+
+// ----------------- Cache File ----------------- //
+function cacheFile(file) {
+  if (file) {
+    localStorage.setItem("upload_audio_cache", file);
+  } else {
+    console.log("CRASH: No file selected.");
+  }
+}
