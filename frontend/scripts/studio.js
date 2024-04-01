@@ -1,5 +1,6 @@
 console.clear();
 
+// ----------------- Global Variables -----------------//
 const audioExample = {
   example_audio_1: {
     fileName: "naan_yen.mp3",
@@ -31,6 +32,23 @@ welcomeSubtitle.textContent = `Welcome back to your studio`;
 
 // ----------------- Load Selected Audio ----------------- //
 loadSelectedAudio(localStorage.getItem("upload_audio_cache"));
+
+// ----------------- Load Audio Example Attributes ----------------- //
+document.querySelector("#audio_example_container_1 .card-title").textContent =
+  audioExample.example_audio_1.title;
+document.querySelector("#audio_example_container_1 .card-text").textContent =
+  audioExample.example_audio_1.duration;
+document
+  .querySelector("#audio_example_container_1 .card-text")
+  .setAttribute("title", audioExample.example_audio_1.singers);
+
+document.querySelector("#audio_example_container_2 .card-title").textContent =
+  audioExample.example_audio_2.title;
+document.querySelector("#audio_example_container_2 .card-text").textContent =
+  audioExample.example_audio_2.duration;
+document
+  .querySelector("#audio_example_container_2 .card-text")
+  .setAttribute("title", audioExample.example_audio_2.singers);
 
 // ----------------- Get Selected Audio ----------------- //
 function loadSelectedAudio(fileName) {
@@ -87,4 +105,5 @@ function getUserName(method) {
 function loadAudioTemplate(template) {
   console.log(audioExample[template]);
   loadSelectedAudio(audioExample[template].fileName);
+  localStorage.setItem("upload_audio_cache", audioExample[template].fileName);
 }
