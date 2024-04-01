@@ -1,7 +1,6 @@
 # Folders
 Test/
 test/
-spleeter/
 pretrained_models/
 output/
 features/
@@ -9,6 +8,11 @@ backend/flask/Include/
 backend/flask/Lib/
 backend/flask/Scripts/
 backend/flask/uploads/
+backend/spleeter/Include/
+backend/spleeter/Lib/
+backend/spleeter/Scripts/
+backend/spleeter/example/
+backend/spleeter/spleeter/
 
 # Python
 __pycache__/
