@@ -82,25 +82,12 @@ uploadAudioButton.addEventListener("click", () => {
 });
 
 // ----------------- Cache File ----------------- //
-function cacheFilePath(file) {
+function cacheFile(file) {
   if (file) {
-    localStorage.setItem("upload_audio_cache", getFilePath(file));
-    console.log("File path cached:", getFilePath(file));
+    localStorage.setItem("upload_audio_cache", file.name);
+    console.log("File name cached:", file.name);
   } else {
     console.log("CRASH: No file selected.");
     alert("CRASH: Audio caching failed.");
   }
-}
-
-// ----------------- Get File Path ----------------- //
-function getFilePath(file) {
-  if (file.webkitRelativePath) {
-    console.log("File path:", file.webkitRelativePath);
-    return file.webkitRelativePath;
-  }
-
-  const fileName = file.name;
-  const folderPath = fileName.split("/").slice(0, -1).join("/");
-  console.log("File path:", folderPath);
-  return folderPath;
 }
