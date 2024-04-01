@@ -43,29 +43,15 @@ observer.observe(heroSection);
 
 // ----------------- Audio Selection ----------------- //
 selectAudioButton.addEventListener("click", () => {
-  console.log("Inside click event");
-
   const input = document.createElement("input");
   input.type = "file";
   input.accept = ".mp3, .wav";
 
   input.onchange = (e) => {
-    console.log("Inside onchange event");
-
     file = e.target.files[0];
-    console.log(file);
-    // const reader = new FileReader();
-    // reader.readAsDataURL(file);
-    // reader.onload = (readerEvent) => {
-    //   const content = readerEvent.target.result;
-    //   const audio = new Audio(content);
-    //   audio.play();
-    // };
     selectAudioButtonText.textContent = "Selected";
     selectAudioButton.classList.add("light-green-bgcolor");
   };
-
-  console.log("Out of onchange event");
 
   input.click();
 });
@@ -73,8 +59,9 @@ selectAudioButton.addEventListener("click", () => {
 // ----------------- Audio Upload ----------------- //
 uploadAudioButton.addEventListener("click", () => {
   if (file) {
+    console.log("Uploading file", file);
     const formData = new FormData();
-    formData.append("audio", file);
+    formData.append("file", file);
 
     fetch("http://localhost:5000/upload", {
       method: "POST",

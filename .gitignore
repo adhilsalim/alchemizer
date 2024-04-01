@@ -8,6 +8,7 @@ features/
 backend/flask/Include/
 backend/flask/Lib/
 backend/flask/Scripts/
+backend/flask/uploads/
 
 # Python
 __pycache__/
