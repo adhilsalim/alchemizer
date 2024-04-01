@@ -1,6 +1,8 @@
 console.clear();
 
 // ----------------- Global Variables -----------------//
+const separateAudioButton = document.getElementById("separate-audio");
+
 const audioExample = {
   example_audio_1: {
     fileName: "naan_yen.mp3",
@@ -49,6 +51,25 @@ document.querySelector("#audio_example_container_2 .card-text").textContent =
 document
   .querySelector("#audio_example_container_2 .card-text")
   .setAttribute("title", audioExample.example_audio_2.singers);
+
+// ----------------- Get Stems ----------------- //
+separateAudioButton.addEventListener("click", () => {
+  console.log("Select Audio Button Clicked");
+  fetch(
+    `http://localhost:5000/separate-audio?filename=${localStorage.getItem(
+      "upload_audio_cache"
+    )}`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Audio separation successful:", data.message);
+      alert("Audio separation successful:", data.message);
+    })
+    .catch((error) => {
+      console.error("Error separating audio:", error);
+      alert("Error separating audio:", error);
+    });
+});
 
 // ----------------- Get Selected Audio ----------------- //
 function loadSelectedAudio(fileName) {
