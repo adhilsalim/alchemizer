@@ -57,7 +57,7 @@ document
 // ----------------- Get Stems ----------------- //
 separateAudioButton.addEventListener("click", () => {
   showToast({
-    title: "Separating Audio",
+    title: "Separating Audio 🎶",
     type: "info",
     message: "This may take a few minutes<br>Wait until we bake your music!",
     delay: 10000,
@@ -71,16 +71,16 @@ separateAudioButton.addEventListener("click", () => {
     .then((data) => {
       console.log("Audio separation successful:", data.message);
       showToast({
-        title: "Audio Separated",
+        title: "Audio Separated 🎉",
         type: "success",
         message: "Audio separated successfully.",
-        delay: 3000,
+        delay: 10000,
       });
     })
     .catch((error) => {
       console.error("Error separating audio:", error);
       showToast({
-        title: "Error Separating Audio",
+        title: "Error Separating Audio 💔",
         type: "error",
         message: "Error separating audio",
         delay: 5000,
@@ -95,7 +95,7 @@ async function loadSelectedAudio(fileName) {
       showToast({
         title: "Loading Audio",
         type: "info",
-        message: "Loading selected audio...",
+        message: "Loading " + fileName,
         delay: 3000,
       });
       const response = await fetch(
@@ -116,32 +116,32 @@ async function loadSelectedAudio(fileName) {
           mainAudioTitle.innerHTML = title;
         })();
         showToast({
-          title: "Audio Loaded",
+          title: "Audio Loaded 🎉",
           type: "success",
           message: "Selected audio loaded successfully.",
           delay: 3000,
         });
       } else {
         showToast({
-          title: "Error Loading Audio",
+          title: "Error Loading Audio 😓",
           type: "error",
-          message: "Error loading audio",
+          message: "Internal server error. Please try again later.",
           delay: 5000,
         });
         throw new Error("Error loading audio");
       }
     } catch (error) {
       showToast({
-        title: "Error Loading Audio",
+        title: "Error Loading Audio 😓",
         type: "error",
-        message: "Error loading audio",
+        message: "Internal server error. Please try again later.",
         delay: 5000,
       });
       console.error("Error loading audio:", error);
     }
   } else {
     showToast({
-      title: "No Audio Found",
+      title: "No Audio Found 🔎",
       type: "error",
       message: "No audio found",
       delay: 5000,
@@ -162,9 +162,9 @@ async function getAudioTitle(fileName) {
     return data.title;
   } catch (error) {
     showToast({
-      title: "Error Fetching Audio Title",
+      title: "Error Fetching Audio Title 😓",
       type: "error",
-      message: "Error fetching audio title",
+      message: "Internal server error. Please try again later.",
       delay: 5000,
     });
     console.error("Error fetching audio title:", error);

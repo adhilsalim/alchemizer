@@ -85,7 +85,7 @@ uploadAudioButton.addEventListener("click", () => {
           "Upload Failed";
         console.error("Error uploading file", error);
         showToast({
-          title: "Upload Error",
+          title: "Upload Error 😭",
           type: "error",
           message: "Internal server error. Please try again later.",
           delay: 10000,
@@ -93,7 +93,7 @@ uploadAudioButton.addEventListener("click", () => {
       });
   } else {
     showToast({
-      title: "Upload Error",
+      title: "Upload Error 😤",
       type: "error",
       message: "No file selected. Please select a file to upload.",
       delay: 10000,
