@@ -9,6 +9,7 @@ const selectAudioButtonText = document.getElementById("select-audio-text");
 const uploadAudioButton = document.getElementById("upload-audio");
 const navbar = document.querySelector(".nav-container");
 const heroSection = document.querySelector(".hero-main");
+const toastContainer = document.getElementById("main-toast-container");
 
 // ----------------- Navbar Auto Expand Animation ----------------- //
 
@@ -63,6 +64,7 @@ uploadAudioButton.addEventListener("click", () => {
     console.log("Uploading file", file);
     uploadAudioButton.querySelector(".modal-button-text").textContent =
       "Uploading...";
+    uploadAudioButton.classList.remove("light-red-bgcolor");
     uploadAudioButton.classList.add("light-green-bgcolor");
     const formData = new FormData();
     formData.append("file", file);
@@ -82,10 +84,20 @@ uploadAudioButton.addEventListener("click", () => {
         uploadAudioButton.querySelector(".modal-button-text").textContent =
           "Upload Failed";
         console.error("Error uploading file", error);
-        alert("Error uploading file. Please try again.");
+        showToast({
+          title: "Upload Error",
+          type: "error",
+          message: "Internal server error. Please try again later.",
+          delay: 10000,
+        });
       });
   } else {
-    alert("Please select/record an audio file.");
+    showToast({
+      title: "Upload Error",
+      type: "error",
+      message: "No file selected. Please select a file to upload.",
+      delay: 10000,
+    });
   }
 });
 
@@ -96,6 +108,36 @@ function cacheFile(file) {
     console.log("File name cached:", file.name);
   } else {
     console.log("CRASH: No file selected.");
-    alert("CRASH: Audio caching failed.");
+    showToast({
+      title: "Cache Error",
+      type: "error",
+      message: "No file selected.",
+      delay: 10000,
+    });
   }
+}
+
+// ----------------- Show Toast ----------------- //
+function showToast(data) {
+  const toastHTML = `<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="color: ${
+    data.type === "error" ? "#cf4444" : "#ffffff"
+  }"><div class="toast-header"><img src="" class="rounded me-2" alt=""><strong class="me-auto">${
+    data.title
+  }</strong><small class="text-muted">${
+    data.time || "just now"
+  }</small><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div><div class="toast-body">${
+    data.message
+  }</div></div>`;
+
+  const toastElement = new DOMParser().parseFromString(toastHTML, "text/html")
+    .body.firstChild;
+  const toast = new bootstrap.Toast(toastContainer.appendChild(toastElement), {
+    delay: data.delay || 5000,
+  });
+
+  const elementsToRemove = document.querySelectorAll("div.toast.fade.hide");
+
+  elementsToRemove.forEach((element) => element.remove());
+
+  toast.show();
 }
