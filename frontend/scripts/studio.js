@@ -123,7 +123,7 @@ async function loadSelectedAudio(fileName) {
         })();
         showToast({
           title: "Audio Loaded 🎉",
-          type: "success",
+          type: "info",
           message: "Selected audio loaded successfully.",
           delay: 3000,
         });
@@ -218,6 +218,14 @@ function loadAudioTemplate(template) {
 
 // ----------------- Show Toast ----------------- //
 function showToast(data) {
+  const errorAudio = new Audio("../audio/error.mp3");
+  const successAudio = new Audio("../audio/success.mp3");
+
+  if (data.type === "error") {
+    errorAudio.play();
+  } else if (data.type === "success") {
+    successAudio.play();
+  }
   const toastHTML = `<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="color: ${
     data.type === "error" ? "#cf4444" : "black"
   }"><div class="toast-header"><img src="" class="rounded me-2" alt=""><strong class="me-auto">${
