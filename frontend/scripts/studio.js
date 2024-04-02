@@ -28,6 +28,7 @@ const MainAudioPlayerContainer = document.querySelector(
   "#main-audio-player-container"
 );
 const mainAudioTitle = document.querySelector("#audio_main_title");
+const toastContainer = document.getElementById("main-toast-container");
 
 // ----------------- Welcome Message ----------------- //
 welcomeTitle.textContent = `Hello, ${getUserName("first")}`;
@@ -55,7 +56,12 @@ document
 
 // ----------------- Get Stems ----------------- //
 separateAudioButton.addEventListener("click", () => {
-  console.log("Select Audio Button Clicked");
+  showToast({
+    title: "Separating Audio",
+    type: "info",
+    message: "This may take a few minutes<br>Wait until we bake your music!",
+    delay: 10000,
+  });
   fetch(
     `http://localhost:5000/separate-audio?filename=${localStorage.getItem(
       "upload_audio_cache"
@@ -64,11 +70,21 @@ separateAudioButton.addEventListener("click", () => {
     .then((response) => response.json())
     .then((data) => {
       console.log("Audio separation successful:", data.message);
-      alert("Audio separation successful:", data.message);
+      showToast({
+        title: "Audio Separated",
+        type: "success",
+        message: "Audio separated successfully.",
+        delay: 3000,
+      });
     })
     .catch((error) => {
       console.error("Error separating audio:", error);
-      alert("Error separating audio:", error);
+      showToast({
+        title: "Error Separating Audio",
+        type: "error",
+        message: "Error separating audio",
+        delay: 5000,
+      });
     });
 });
 
@@ -76,6 +92,12 @@ separateAudioButton.addEventListener("click", () => {
 async function loadSelectedAudio(fileName) {
   if (fileName) {
     try {
+      showToast({
+        title: "Loading Audio",
+        type: "info",
+        message: "Loading selected audio...",
+        delay: 3000,
+      });
       const response = await fetch(
         `http://localhost:5000/load-audio?filename=${fileName}`
       );
@@ -93,15 +115,38 @@ async function loadSelectedAudio(fileName) {
           }
           mainAudioTitle.innerHTML = title;
         })();
+        showToast({
+          title: "Audio Loaded",
+          type: "success",
+          message: "Selected audio loaded successfully.",
+          delay: 3000,
+        });
       } else {
+        showToast({
+          title: "Error Loading Audio",
+          type: "error",
+          message: "Error loading audio",
+          delay: 5000,
+        });
         throw new Error("Error loading audio");
       }
     } catch (error) {
+      showToast({
+        title: "Error Loading Audio",
+        type: "error",
+        message: "Error loading audio",
+        delay: 5000,
+      });
       console.error("Error loading audio:", error);
     }
   } else {
+    showToast({
+      title: "No Audio Found",
+      type: "error",
+      message: "No audio found",
+      delay: 5000,
+    });
     console.log("No audio found");
-    alert("No audio found");
   }
 }
 
@@ -116,6 +161,12 @@ async function getAudioTitle(fileName) {
     console.log("Audio Title:", data.title);
     return data.title;
   } catch (error) {
+    showToast({
+      title: "Error Fetching Audio Title",
+      type: "error",
+      message: "Error fetching audio title",
+      delay: 5000,
+    });
     console.error("Error fetching audio title:", error);
     return null;
   }
@@ -157,4 +208,29 @@ function loadAudioTemplate(template) {
   console.log(audioExample[template]);
   loadSelectedAudio(audioExample[template].fileName);
   localStorage.setItem("upload_audio_cache", audioExample[template].fileName);
+}
+
+// ----------------- Show Toast ----------------- //
+function showToast(data) {
+  const toastHTML = `<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="color: ${
+    data.type === "error" ? "#cf4444" : "#ffffff"
+  }"><div class="toast-header"><img src="" class="rounded me-2" alt=""><strong class="me-auto">${
+    data.title
+  }</strong><small class="text-muted">${
+    data.time || "just now"
+  }</small><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div><div class="toast-body">${
+    data.message
+  }</div></div>`;
+
+  const toastElement = new DOMParser().parseFromString(toastHTML, "text/html")
+    .body.firstChild;
+  const toast = new bootstrap.Toast(toastContainer.appendChild(toastElement), {
+    delay: data.delay || 5000,
+  });
+
+  const elementsToRemove = document.querySelectorAll("div.toast.fade.hide");
+
+  elementsToRemove.forEach((element) => element.remove());
+
+  toast.show();
 }
