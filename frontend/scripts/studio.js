@@ -213,7 +213,7 @@ function loadAudioTemplate(template) {
 // ----------------- Show Toast ----------------- //
 function showToast(data) {
   const toastHTML = `<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="color: ${
-    data.type === "error" ? "#cf4444" : "#ffffff"
+    data.type === "error" ? "#cf4444" : "black"
   }"><div class="toast-header"><img src="" class="rounded me-2" alt=""><strong class="me-auto">${
     data.title
   }</strong><small class="text-muted">${
