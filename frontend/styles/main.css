@@ -163,6 +163,11 @@ nav {
   color: #404040;
 }
 
+.light-red-bgcolor {
+  background-color: #ff0000;
+  color: #ffffff;
+}
+
 .light-green-color {
   color: #00ffae;
 }

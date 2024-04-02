@@ -61,6 +61,9 @@ selectAudioButton.addEventListener("click", () => {
 uploadAudioButton.addEventListener("click", () => {
   if (file) {
     console.log("Uploading file", file);
+    uploadAudioButton.querySelector(".modal-button-text").textContent =
+      "Uploading...";
+    uploadAudioButton.classList.add("light-green-bgcolor");
     const formData = new FormData();
     formData.append("file", file);
 
@@ -74,7 +77,12 @@ uploadAudioButton.addEventListener("click", () => {
         window.location.href = `http://localhost:3000/studio/`;
       })
       .catch((error) => {
+        uploadAudioButton.classList.remove("light-green-bgcolor");
+        uploadAudioButton.classList.add("light-red-bgcolor");
+        uploadAudioButton.querySelector(".modal-button-text").textContent =
+          "Upload Failed";
         console.error("Error uploading file", error);
+        alert("Error uploading file. Please try again.");
       });
   } else {
     alert("Please select/record an audio file.");
