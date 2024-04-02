@@ -2,6 +2,9 @@
  * Sound Effect Credits:
  * <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=140883">UNIVERSFIELD</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=140883">Pixabay</a>
  * <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=126515">UNIVERSFIELD</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=126515">Pixabay</a>
+ * <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=143022">UNIVERSFIELD</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=143022">Pixabay</a>
+ * <a href="https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=87963">Pixabay</a>
+ * <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=132470">UNIVERSFIELD</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=132470">Pixabay</a>
  */
 
 console.clear();
@@ -218,14 +221,17 @@ function loadAudioTemplate(template) {
 
 // ----------------- Show Toast ----------------- //
 function showToast(data) {
-  const errorAudio = new Audio("../audio/error.mp3");
-  const successAudio = new Audio("../audio/success.mp3");
-
   if (data.type === "error") {
+    const errorAudio = new Audio("../audio/error.mp3");
     errorAudio.play();
   } else if (data.type === "success") {
+    const successAudio = new Audio("../audio/success.mp3");
     successAudio.play();
+  } else if (data.type === "info") {
+    const infoAudio = new Audio("../audio/info.mp3");
+    infoAudio.play();
   }
+
   const toastHTML = `<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="color: ${
     data.type === "error" ? "#cf4444" : "black"
   }"><div class="toast-header"><img src="" class="rounded me-2" alt=""><strong class="me-auto">${

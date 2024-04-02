@@ -119,14 +119,17 @@ function cacheFile(file) {
 
 // ----------------- Show Toast ----------------- //
 function showToast(data) {
-  const errorAudio = new Audio("../audio/error.mp3");
-  const successAudio = new Audio("../audio/success.mp3");
-
   if (data.type === "error") {
+    const errorAudio = new Audio("../audio/error.mp3");
     errorAudio.play();
   } else if (data.type === "success") {
+    const successAudio = new Audio("../audio/success.mp3");
     successAudio.play();
+  } else if (data.type === "info") {
+    const infoAudio = new Audio("../audio/info.mp3");
+    infoAudio.play();
   }
+
   const toastHTML = `<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="color: ${
     data.type === "error" ? "#cf4444" : "black"
   }"><div class="toast-header"><img src="" class="rounded me-2" alt=""><strong class="me-auto">${
