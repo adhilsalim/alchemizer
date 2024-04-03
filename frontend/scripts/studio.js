@@ -268,6 +268,10 @@ function showModal(data) {
   modalContainer.style.display = "block";
   modalContainer.setAttribute("aria-modal", "true");
 
+  const backdrop = document.createElement("div");
+  backdrop.classList.add("modal-backdrop", "fade", "show");
+  document.body.appendChild(backdrop);
+
   var closeButtons = document.querySelectorAll('[data-bs-dismiss="modal"]');
 
   closeButtons.forEach(function (button) {
@@ -275,14 +279,8 @@ function showModal(data) {
       modalContainer.classList.remove("show");
       modalContainer.style.display = "none";
       modalContainer.removeAttribute("aria-modal");
+      backdrop.remove();
       button.removeEventListener("click", function () {});
     });
   });
 }
-
-showModal({
-  title: "Modal Title",
-  body: "This is the body of the modal",
-  actionFunction: "console.log('Action button clicked')",
-  actionButtonText: "Action Button",
-});
