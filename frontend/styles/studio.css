@@ -161,3 +161,21 @@ h1 {
   color: #8500ff;
   font-size: 24px;
 }
+
+#control-section-title {
+  background: linear-gradient(to right, #8500ff 20%, #de00ff 60%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  font-size: 3rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.result-section {
+  margin: 10px;
+  padding: 20px 0px 20px 0px;
+  background-color: #ffffff;
+  border-radius: 15px;
+}

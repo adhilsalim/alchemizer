@@ -26,7 +26,7 @@
             <div class="row">
                 <div class="col-md-6 col-sm-12" id="mysection-1">
                     <div class="row">
-                        <h2 id="audio_main_title">Afreen Afreen</h2>
+                        <h2 id="audio_main_title">Loading</h2>
                         <p id="audio_main_label">Original</p>
                     </div>
                     <div class="row" id="main-audio-player-container">
@@ -44,8 +44,8 @@
                                         <span class="material-symbols-outlined">
                                             play_arrow
                                         </span>
-                                        <h5 class="card-title">Afreen Afreen</h5>
-                                        <p class="card-text">4:44</p>
+                                        <h5 class="card-title"></h5>
+                                        <p class="card-text"></p>
                                     </div>
                                 </div>
                             </div>
@@ -56,8 +56,8 @@
                                     <div class="card-body"><span class="material-symbols-outlined">
                                             play_arrow
                                         </span>
-                                        <h5 class="card-title">Satranga</h5>
-                                        <p class="card-text">5:45</p>
+                                        <h5 class="card-title"></h5>
+                                        <p class="card-text"></p>
                                     </div>
                                 </div>
                             </div>
@@ -68,45 +68,57 @@
         </div>
     </div>
     <div class="main-section">
+        <div class="container" style="padding-top: 50px; padding-bottom: 50px;">
+            <div class="row">
+                <div class="col-6 align-self-center">
+                    <p class="display-4" id="control-section-title"><span>Audio</span> Management</p>
+                    <p style="margin-right: 100px;">This section allows you to manage your audio files. select 'separate
+                        audio' to get
+                        stems of the
+                        audio. select 'convert audio' to convert the audio to a different instrument formats.</p>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-12 m-2">
+                            <div class="main-button">
+                                <div class="main-button-text" id="separate-audio">Separate Audio</div>
+                                <div class="main-button-icon">
+                                    <span class="material-symbols-outlined">
+                                        arrow_split
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 m-2">
+                            <div class="main-button" onclick="showToast({
+                                title: 'Feature Coming Soon 🚀',
+                                message: 'This feature is under development and will be available soon.',
+                                type: 'info'
+                            })">
+                                <div class="main-button-text">Convert Audio</div>
+                                <div class="main-button-icon">
+                                    <span class="material-symbols-outlined">
+                                        change_circle
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="result-section">
         <div class="container">
-            <div class="row d-flex justify-content-around" style="padding-top: 50px;">
-                <p class="text-center display-4"><span>Select</span> An Option To Get Started</p>
-            </div>
-        </div>
-        <div class="container text-center">
-            <div class="row justify-content-md-center">
-                <div class="col col-lg-auto">
-                    <div class="main-button">
-                        <div class="main-button-text" id="separate-audio">Separate Audio</div>
-                        <div class="main-button-icon">
-                            <span class="material-symbols-outlined">
-                                arrow_split
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-1">
-
-                </div>
-                <div class="col col-lg-auto">
-                    <div class="main-button" onclick="showToast({
-                        title: 'Feature Coming Soon 🚀',
-                        message: 'This feature is under development and will be available soon.',
-                        type: 'info'
-                    })">
-                        <div class="main-button-text">Convert Audio</div>
-                        <div class="main-button-icon">
-                            <span class="material-symbols-outlined">
-                                change_circle
-                            </span>
+            <div class="row">
+                <div class="row text-center">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
                 </div>
             </div>
-
-        </div>
-        <div class="row text-center" style="margin-top: 100px;">
-            <p>No operations performed.</p>
         </div>
     </div>
     <div aria-live="polite" aria-atomic="true" class="position-relative">
