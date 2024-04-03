@@ -28,6 +28,8 @@ const audioExample = {
   },
 };
 
+let selectedStems = "2stems";
+
 //----------------- DOM Elements -----------------//
 const welcomeTitle = document.querySelector("#welcome-title");
 const welcomeSubtitle = document.querySelector("#welcome-subtitle");
@@ -66,12 +68,48 @@ document
 
 // ----------------- Get Stems ----------------- //
 separateAudioButton.addEventListener("click", () => {
+  let modalHTml = `<div class="dropdown">
+  <p>stems are groups of audio sources that are mixed together to create a cohesive musical piece.</p>
+  <ul>
+  <li>2-stems: vocals + accompaniment</li>
+  <li>4-stems: vocals + drum + bass + other</li>
+  <li>5-stems: vocals + drums + bass + piano + other</li>
+  </ul>
+  <br>
+  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="stem-dropdown-btn">
+    Select Stems: ${selectedStems}
+  </button>
+  <ul class="dropdown-menu" id="stem-dropdown-menu">
+    <li class="dropdown-item" onclick="selectStem('2stems')">2 stems</li>
+    <li class="dropdown-item" onclick="selectStem('4stems')">4 stems</li>
+    <li class="dropdown-item" onclick="selectStem('5stems')">5 stems</li>
+  </ul>
+</div>`;
+  showModal({
+    title: "Select Stems",
+    body: modalHTml,
+    actionFunction: "console.log('Stems selected')",
+    actionButtonText: "Continue",
+  });
+});
+
+function selectStem(stems) {
+  console.log("Select Stems:", selectedStems);
+  selectedStems = stems;
+
+  document.getElementById(
+    "stem-dropdown-btn"
+  ).textContent = `Selected Stems: ${selectedStems}`;
+}
+
+function getStems(stems) {
   showToast({
     title: "Separating Audio 🎶",
     type: "info",
     message: "This may take a few minutes<br>Wait until we bake your music!",
     delay: 10000,
   });
+
   fetch(
     `http://localhost:5000/separate-audio?filename=${localStorage.getItem(
       "upload_audio_cache"
@@ -96,7 +134,7 @@ separateAudioButton.addEventListener("click", () => {
         delay: 5000,
       });
     });
-});
+}
 
 // ----------------- Get Selected Audio ----------------- //
 async function loadSelectedAudio(fileName) {
