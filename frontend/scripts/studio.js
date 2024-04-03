@@ -38,6 +38,7 @@ const MainAudioPlayerContainer = document.querySelector(
 );
 const mainAudioTitle = document.querySelector("#audio_main_title");
 const toastContainer = document.getElementById("main-toast-container");
+var modalContainer = document.getElementById("main-modal-container");
 
 // ----------------- Welcome Message ----------------- //
 welcomeTitle.textContent = `Hello, ${getUserName("first")}`;
@@ -249,8 +250,35 @@ function showToast(data) {
   });
 
   const elementsToRemove = document.querySelectorAll("div.toast.fade.hide");
-
   elementsToRemove.forEach((element) => element.remove());
-
   toast.show();
 }
+
+// ----------------- Show Modal ----------------- //
+function showModal(data) {
+  console.log("Showing modal:", data);
+  const modalHTML = `<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h1 class="modal-title fs-5" id="staticBackdropLabel">${data.title}</h1><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body">${data.body}</div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-primary" onclick="${data.actionFunction}">${data.actionButtonText}</button></div></div></div>`;
+
+  modalContainer.innerHTML = modalHTML;
+  modalContainer.classList.add("show");
+  modalContainer.style.display = "block";
+  modalContainer.setAttribute("aria-modal", "true");
+
+  var closeButtons = document.querySelectorAll('[data-bs-dismiss="modal"]');
+
+  closeButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      modalContainer.classList.remove("show");
+      modalContainer.style.display = "none";
+      modalContainer.removeAttribute("aria-modal");
+      button.removeEventListener("click", function () {});
+    });
+  });
+}
+
+showModal({
+  title: "Modal Title",
+  body: "This is the body of the modal",
+  actionFunction: "console.log('Action button clicked')",
+  actionButtonText: "Action Button",
+});
