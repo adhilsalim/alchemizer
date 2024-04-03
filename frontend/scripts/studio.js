@@ -40,7 +40,10 @@ const MainAudioPlayerContainer = document.querySelector(
 );
 const mainAudioTitle = document.querySelector("#audio_main_title");
 const toastContainer = document.getElementById("main-toast-container");
-var modalContainer = document.getElementById("main-modal-container");
+const modalContainer = document.getElementById("main-modal-container");
+const audioSeparationLoader = document.getElementById(
+  "audio-separation-loader"
+);
 
 // ----------------- Welcome Message ----------------- //
 welcomeTitle.textContent = `Hello, ${getUserName("first")}`;
@@ -103,6 +106,7 @@ function selectStem(stems) {
 }
 
 function getStems() {
+  audioSeparationLoader.style.display = "block";
   showToast({
     title: "Separating Audio 🎶",
     type: "info",
@@ -117,6 +121,7 @@ function getStems() {
   )
     .then((response) => response.json())
     .then((data) => {
+      audioSeparationLoader.style.display = "none";
       console.log("Audio separation successful:", data.message);
       showToast({
         title: "Audio Separated 🎉",

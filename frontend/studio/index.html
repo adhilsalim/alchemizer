@@ -15,7 +15,7 @@
 </head>
 
 <body>
-    <div class="hero-section">
+    <div class="hero-section" style="padding-bottom: 100px;">
         <div class="container">
             <div class="row">
                 <h1 id="welcome-title">Loading</h1>
@@ -109,12 +109,98 @@
         </div>
     </div>
     <div class="result-section">
-        <div class="container">
+        <div class="container" style="padding-top: 50px; padding-bottom: 50px;">
             <div class="row">
-                <div class="row text-center">
-                    <div class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                <div class="col-6 align-self-center">
+                    <p class="display-4" id="control-section-title"><span>Audio</span> Separation</p>
+                    <p style="margin-right: 100px;">Find your separated audio files here. You can either download or
+                        convert the audio files.</p>
+                </div>
+                <div class="col-6">
+                    <div class="row" id="audio-separation-loader" style="display: none;">
+                        <div class="row text-center">
+                            <div class="text-center">
+                                <div class=" spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 border mt-2 mb-2">
+                            <div class="stem-audio-container" style="border-radius: 20px; margin: 5px;">
+                                <div class="stem-audio-title">
+                                    <p>Vocals</p>
+                                </div>
+                                <div class="stem-audio-player">
+                                    <wave-audio-path-player src="../audio/success.mp3" wave-width="360" wave-height="80"
+                                        color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}'
+                                        title=""></wave-audio-path-player>
+                                </div>
+                                <div class="stem-audio-controls"
+                                    style="display: flex; flex-direction: row; justify-content: end;">
+                                    <div class="main-button-icon me-2">
+                                        <span class="material-symbols-outlined">
+                                            download
+                                        </span>
+                                    </div>
+                                    <div class="main-button-icon me-2">
+                                        <span class="material-symbols-outlined">
+                                            arrow_split
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 border mt-2 mb-2">
+                            <div class="stem-audio-container" style="border-radius: 20px; margin: 5px;">
+                                <div class="stem-audio-title">
+                                    <p>Bass</p>
+                                </div>
+                                <div class="stem-audio-player">
+                                    <wave-audio-path-player src="../audio/success.mp3" wave-width="360" wave-height="80"
+                                        color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}'
+                                        title=""></wave-audio-path-player>
+                                </div>
+                                <div class="stem-audio-controls"
+                                    style="display: flex; flex-direction: row; justify-content: end;">
+                                    <div class="main-button-icon">
+                                        <span class="material-symbols-outlined">
+                                            download
+                                        </span>
+                                    </div>
+                                    <div class="main-button-icon">
+                                        <span class="material-symbols-outlined">
+                                            arrow_split
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 border mt-2 mb-2">
+                            <div class="stem-audio-container" style="border-radius: 20px; margin: 5px;">
+                                <div class="stem-audio-title">
+                                    <p>Drums</p>
+                                </div>
+                                <div class="stem-audio-player">
+                                    <wave-audio-path-player src="../audio/success.mp3" wave-width="360" wave-height="80"
+                                        color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}'
+                                        title=""></wave-audio-path-player>
+                                </div>
+                                <div class="stem-audio-controls"
+                                    style="display: flex; flex-direction: row; justify-content: end;">
+                                    <div class="main-button-icon">
+                                        <span class="material-symbols-outlined">
+                                            download
+                                        </span>
+                                    </div>
+                                    <div class="main-button-icon">
+                                        <span class="material-symbols-outlined">
+                                            arrow_split
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
