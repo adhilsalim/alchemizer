@@ -222,15 +222,19 @@ function loadAudioTemplate(template) {
 
 // ----------------- Show Toast ----------------- //
 function showToast(data) {
-  if (data.type === "error") {
-    const errorAudio = new Audio("../audio/error.mp3");
-    errorAudio.play();
-  } else if (data.type === "success") {
-    const successAudio = new Audio("../audio/success.mp3");
-    successAudio.play();
-  } else if (data.type === "info") {
-    const infoAudio = new Audio("../audio/info.mp3");
-    infoAudio.play();
+  try {
+    if (data.type === "error") {
+      const errorAudio = new Audio("../audio/error.mp3");
+      errorAudio.play();
+    } else if (data.type === "success") {
+      const successAudio = new Audio("../audio/success.mp3");
+      successAudio.play();
+    } else if (data.type === "info") {
+      const infoAudio = new Audio("../audio/info.mp3");
+      infoAudio.play();
+    }
+  } catch (error) {
+    console.error("Error playing audio:", error);
   }
 
   const toastHTML = `<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="color: ${
