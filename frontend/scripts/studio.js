@@ -77,8 +77,7 @@ separateAudioButton.addEventListener("click", () => {
   </ul>
   <br>
   <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="stem-dropdown-btn">
-    Select Stems: ${selectedStems}
-  </button>
+    Select Stems: ${selectedStems}</button>
   <ul class="dropdown-menu" id="stem-dropdown-menu">
     <li class="dropdown-item" onclick="selectStem('2stems')">2 stems</li>
     <li class="dropdown-item" onclick="selectStem('4stems')">4 stems</li>
@@ -88,21 +87,21 @@ separateAudioButton.addEventListener("click", () => {
   showModal({
     title: "Select Stems",
     body: modalHTml,
-    actionFunction: "console.log('Stems selected')",
+    actionFunction: "getStems()",
     actionButtonText: "Continue",
   });
 });
 
 function selectStem(stems) {
-  console.log("Select Stems:", selectedStems);
   selectedStems = stems;
+  console.log("Select Stems:", selectedStems);
 
   document.getElementById(
     "stem-dropdown-btn"
-  ).textContent = `Selected Stems: ${selectedStems}`;
+  ).textContent = `Select Stems: ${selectedStems}`;
 }
 
-function getStems(stems) {
+function getStems() {
   showToast({
     title: "Separating Audio 🎶",
     type: "info",
@@ -110,30 +109,30 @@ function getStems(stems) {
     delay: 10000,
   });
 
-  fetch(
-    `http://localhost:5000/separate-audio?filename=${localStorage.getItem(
-      "upload_audio_cache"
-    )}`
-  )
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Audio separation successful:", data.message);
-      showToast({
-        title: "Audio Separated 🎉",
-        type: "success",
-        message: "Audio separated successfully.",
-        delay: 10000,
-      });
-    })
-    .catch((error) => {
-      console.error("Error separating audio:", error);
-      showToast({
-        title: "Error Separating Audio 💔",
-        type: "error",
-        message: "Error separating audio",
-        delay: 5000,
-      });
-    });
+  // fetch(
+  //   `http://localhost:5000/separate-audio?filename=${localStorage.getItem(
+  //     "upload_audio_cache"
+  //   )}&stems=${selectedStems}`
+  // )
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  //     console.log("Audio separation successful:", data.message);
+  //     showToast({
+  //       title: "Audio Separated 🎉",
+  //       type: "success",
+  //       message: "Audio separated successfully.",
+  //       delay: 10000,
+  //     });
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error separating audio:", error);
+  //     showToast({
+  //       title: "Error Separating Audio 💔",
+  //       type: "error",
+  //       message: "Error separating audio",
+  //       delay: 5000,
+  //     });
+  //   });
 }
 
 // ----------------- Get Selected Audio ----------------- //
