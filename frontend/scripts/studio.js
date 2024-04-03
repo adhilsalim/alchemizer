@@ -88,7 +88,7 @@ separateAudioButton.addEventListener("click", () => {
     title: "Select Stems",
     body: modalHTml,
     actionFunction: "getStems()",
-    autoClose: false,
+    autoClose: true,
     actionButtonText: "Continue",
   });
 });
@@ -110,30 +110,30 @@ function getStems() {
     delay: 10000,
   });
 
-  // fetch(
-  //   `http://localhost:5000/separate-audio?filename=${localStorage.getItem(
-  //     "upload_audio_cache"
-  //   )}&stems=${selectedStems}`
-  // )
-  //   .then((response) => response.json())
-  //   .then((data) => {
-  //     console.log("Audio separation successful:", data.message);
-  //     showToast({
-  //       title: "Audio Separated 🎉",
-  //       type: "success",
-  //       message: "Audio separated successfully.",
-  //       delay: 10000,
-  //     });
-  //   })
-  //   .catch((error) => {
-  //     console.error("Error separating audio:", error);
-  //     showToast({
-  //       title: "Error Separating Audio 💔",
-  //       type: "error",
-  //       message: "Error separating audio",
-  //       delay: 5000,
-  //     });
-  //   });
+  fetch(
+    `http://localhost:5000/separate-audio?filename=${localStorage.getItem(
+      "upload_audio_cache"
+    )}&stems=${selectedStems}`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Audio separation successful:", data.message);
+      showToast({
+        title: "Audio Separated 🎉",
+        type: "success",
+        message: "Audio separated successfully.",
+        delay: 10000,
+      });
+    })
+    .catch((error) => {
+      console.error("Error separating audio:", error);
+      showToast({
+        title: "Error Separating Audio 💔",
+        type: "error",
+        message: "Error separating audio",
+        delay: 5000,
+      });
+    });
 }
 
 // ----------------- Get Selected Audio ----------------- //

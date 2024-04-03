@@ -118,6 +118,8 @@ def separate_audio():
     """
     print('separating audio...')
     filename = request.args.get('filename')
+    stems = request.args.get('stems') # example: 2stems, 4stems, 5stems
+    print('args:', filename, stems)
     if filename:
         file_path = os.path.join('uploads', filename)
         output_dir = 'spleeter_output'
@@ -125,7 +127,7 @@ def separate_audio():
         # check whether the separated audio files already exist
 
         # Construct the Spleeter command
-        command = [spleeter_bin, "separate", "-p", "spleeter:2stems", "-o", output_dir, file_path]
+        command = [spleeter_bin, "separate", "-p", "spleeter:" + stems, "-o", output_dir, file_path]
 
         try:
             # Run the Spleeter command
