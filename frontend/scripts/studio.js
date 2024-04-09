@@ -126,7 +126,8 @@ function getStems() {
       showToast({
         title: "Audio Separated 🎉",
         type: "success",
-        message: "Audio separated successfully.",
+        message:
+          "Audio separated successfully. You can find them in the audio separation section.",
         delay: 10000,
       });
     })

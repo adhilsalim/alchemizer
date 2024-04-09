@@ -179,3 +179,16 @@ h1 {
   background-color: #ffffff;
   border-radius: 15px;
 }
+
+.stem-audio-container {
+  border-radius: 20px;
+  margin: 5px;
+  background-color: #ffffff;
+}
+
+.stem-audio-title {
+  font-family: "Noto Sans Khojki", sans-serif;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #404040;
+}

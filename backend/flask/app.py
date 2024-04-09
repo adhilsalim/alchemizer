@@ -12,6 +12,8 @@ CORS(app)  # Enable CORS for all routes and origins
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
+stemDict = {"2stems": ["vocals", "accompaniment"], "4stems": ["vocals", "drums", "bass", "other"], "5stems": ["vocals", "drums", "bass", "piano", "other"]}
+
 # Path to the Flask virtual environment
 flask_venv_path = r"E:\_ADHIL\___PROJECTS\GITHUB\adhilsalim-alchemizer\backend\flask"
 
