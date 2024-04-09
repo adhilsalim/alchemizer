@@ -11,6 +11,7 @@ CORS(app)  # Enable CORS for all routes and origins
 # cors = CORS(app, resources={r"/*": {"origins": ["http://localhost:3000"]}})
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['SPLEETER_OUTPUT_FOLDER'] = 'spleeter_output'
 
 stemDict = {"2stems": ["vocals", "accompaniment"], "4stems": ["vocals", "drums", "bass", "other"], "5stems": ["vocals", "drums", "bass", "piano", "other"]}
 
@@ -65,9 +66,19 @@ def load_audio():
         A Flask response object containing the audio file, or an error response if the file is not found or no filename is provided.
     """
     print('loading audio...')
+
     filename = request.args.get('filename')
+    filetype = request.args.get('filetype')
+    stemname = request.args.get('stemname')
+
     if filename:
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if filetype == "stem":
+            file_path = os.path.join(app.config['SPLEETER_OUTPUT_FOLDER'], filename, stemname + ".wav")
+            print('using stem file path:', file_path)
+        else:
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            print('using original file path:', file_path)
+
         if os.path.isfile(file_path):
             print('File found:', filename)
             try:

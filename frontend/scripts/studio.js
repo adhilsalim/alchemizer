@@ -28,7 +28,14 @@ const audioExample = {
   },
 };
 
+const stemDict = {
+  "2stems": ["vocals", "accompaniment"],
+  "4stems": ["vocals", "drums", "bass", "other"],
+  "5stems": ["vocals", "drums", "bass", "piano", "other"],
+};
+
 let selectedStems = "2stems";
+
 const serverIP = "http://localhost:5000";
 
 //----------------- DOM Elements -----------------//
@@ -45,7 +52,9 @@ const modalContainer = document.getElementById("main-modal-container");
 const audioSeparationLoader = document.getElementById(
   "audio-separation-loader"
 );
-
+const audioSeparationContainer = document.getElementById(
+  "audio-separation-container"
+);
 // ----------------- Welcome Message ----------------- //
 welcomeTitle.textContent = `Hello, ${getUserName("first")}`;
 welcomeSubtitle.textContent = `Welcome back to your studio`;
@@ -123,6 +132,37 @@ function getStems() {
     .then((response) => response.json())
     .then((data) => {
       audioSeparationLoader.style.display = "none";
+
+      audioSeparationContainer.innerHTML = "";
+
+      console.log("getting stems:", stemDict[selectedStems]);
+      stemDict[selectedStems].forEach((stem) => {
+        (async () => {
+          const response = await fetch(
+            `${serverIP}/load-audio?filename=${localStorage.getItem(
+              "upload_audio_cache"
+            )}&filetype=${"stem"}&stemname=${stem}`
+          );
+          if (response.ok) {
+            const blob = await response.blob();
+            const audioUrl = URL.createObjectURL(blob);
+            audioPLayerHTML = `<div class="col-12 mt-2 mb-2"><div class="stem-audio-container">
+            <div class="stem-audio-title"> <p>${stem}</p> </div> <div class="stem-audio-player">
+            <wave-audio-path-player src="${audioUrl}" wave-width="360" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' title="">
+            </wave-audio-path-player> </div> 
+            <div class="stem-audio-controls" style="display: flex; flex-direction: row; justify-content: end;"> 
+            <div class="card-control-icon"> <span class="material-symbols-outlined"> download </span> </div> 
+            <div class="card-control-icon"> <span class="material-symbols-outlined" onclick="showToast({ title: 'Feature Coming Soon 🚀', message: 'This feature is under development and will be available soon.', type: 'info' })"> arrow_split </span> </div> </div> </div> </div>`;
+
+            const htmlElement = new DOMParser().parseFromString(
+              audioPLayerHTML,
+              "text/html"
+            ).body.firstChild;
+            audioSeparationContainer.appendChild(htmlElement);
+          }
+        })();
+      });
+
       console.log("Audio separation successful:", data.message);
       showToast({
         title: "Audio Separated 🎉",

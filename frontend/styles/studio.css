@@ -183,7 +183,9 @@ h1 {
 .stem-audio-container {
   border-radius: 20px;
   margin: 5px;
+  padding: 20px;
   background-color: #ffffff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .stem-audio-title {
@@ -191,4 +193,28 @@ h1 {
   font-weight: bold;
   font-size: 1.2rem;
   color: #404040;
+}
+
+.card-control-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  margin: 2px;
+  cursor: pointer;
+  background-color: #ffffff;
+  border-radius: 50%;
+}
+
+.card-control-icon span {
+  color: #8500ff;
+}
+
+.card-control-icon:hover span {
+  color: #ffffff;
+}
+
+.card-control-icon:hover {
+  background-color: #8500ff;
 }
