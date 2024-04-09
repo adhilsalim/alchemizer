@@ -29,6 +29,7 @@ const audioExample = {
 };
 
 let selectedStems = "2stems";
+const serverIP = "http://localhost:5000";
 
 //----------------- DOM Elements -----------------//
 const welcomeTitle = document.querySelector("#welcome-title");
@@ -115,7 +116,7 @@ function getStems() {
   });
 
   fetch(
-    `http://localhost:5000/separate-audio?filename=${localStorage.getItem(
+    `${serverIP}/separate-audio?filename=${localStorage.getItem(
       "upload_audio_cache"
     )}&stems=${selectedStems}`
   )
@@ -153,7 +154,7 @@ async function loadSelectedAudio(fileName) {
         delay: 3000,
       });
       const response = await fetch(
-        `http://localhost:5000/load-audio?filename=${fileName}`
+        `${serverIP}/load-audio?filename=${fileName}`
       );
       if (response.ok) {
         console.log("headers:", ...response.headers);
@@ -208,7 +209,7 @@ async function loadSelectedAudio(fileName) {
 async function getAudioTitle(fileName) {
   try {
     const response = await fetch(
-      `http://localhost:5000/get-audio-title?filename=${fileName}`
+      `${serverIP}/get-audio-title?filename=${fileName}`
     );
     const data = await response.json();
     console.log(data);
