@@ -16,10 +16,10 @@ const NavbarLinks = document.querySelectorAll(".nav-link");
 // ----------------- Navbar Link Hover Event Listeners ----------------- //
 NavbarLinks.forEach((link) => {
   link.addEventListener("mouseenter", () =>
-    mouseHovering(`enter-${link.innerText.toLowerCase()}`)
+    mouseHovering(`enter-${link.dataset.navid}`)
   );
   link.addEventListener("mouseleave", () =>
-    mouseHovering(`exit-${link.innerText.toLowerCase()}`)
+    mouseHovering(`exit-${link.dataset.navid}`)
   );
 });
 
