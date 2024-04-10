@@ -11,6 +11,17 @@ const selectAudioButtonText = document.getElementById("select-audio-text");
 const uploadAudioButton = document.getElementById("upload-audio");
 const navbar = document.querySelector(".nav-container");
 const heroSection = document.querySelector(".hero-main");
+const NavbarLinks = document.querySelectorAll(".nav-link");
+
+// ----------------- Navbar Link Hover Event Listeners ----------------- //
+NavbarLinks.forEach((link) => {
+  link.addEventListener("mouseenter", () =>
+    mouseHovering(`enter-${link.innerText.toLowerCase()}`)
+  );
+  link.addEventListener("mouseleave", () =>
+    mouseHovering(`exit-${link.innerText.toLowerCase()}`)
+  );
+});
 
 // ----------------- Navbar Auto Expand Animation ----------------- //
 
