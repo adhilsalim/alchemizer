@@ -2,6 +2,25 @@ const toastContainer = document.getElementById("main-toast-container");
 const modalContainer = document.getElementById("main-modal-container");
 
 // ----------------- Show Toast ----------------- //
+/**
+ * This function displays a toast notification and plays an audio alert based on the type of the notification.
+ *
+ * It takes an object 'data' as an argument, which should contain the following properties:
+ * - type: The type of the notification. It can be "error", "success", or "info".
+ * - title: The title of the notification.
+ * - message: The message of the notification.
+ * - time: The time when the notification was created. If not provided, "just now" is used.
+ * - delay: The delay in milliseconds before the toast notification automatically hides. If not provided, 5000 (5 seconds) is used.
+ *
+ * Based on the 'type', it plays an audio alert. If an error occurs while playing the audio, it logs the error to the console.
+ *
+ * It then creates a new toast notification with the provided 'title', 'message', 'time', and 'delay'. The color of the text in the toast notification is red if the 'type' is "error", and black otherwise.
+ *
+ * If there are any toast notifications that are hidden and faded, it removes them from the DOM.
+ *
+ * Finally, it shows the new toast notification.
+ */
+
 const showToast = (data) => {
   try {
     if (data.type === "error") {
@@ -42,6 +61,30 @@ const showToast = (data) => {
 };
 
 // ----------------- Show Modal ----------------- //
+/**
+ * This function displays a modal dialog with the provided data.
+ *
+ * It takes an object 'data' as an argument, which should contain the following properties:
+ * - title: The title of the modal.
+ * - body: The body content of the modal.
+ * - actionFunction: The JavaScript function to be executed when the action button is clicked.
+ * - actionButtonText: The text to be displayed on the action button.
+ * - autoClose: A boolean indicating whether the modal should automatically close when the action button is clicked.
+ *
+ * The function first logs a message to the console indicating that it is showing the modal.
+ *
+ * It then creates the HTML for the modal using the provided data and sets it as the innerHTML of 'modalContainer'.
+ *
+ * It adds the "show" class to 'modalContainer', sets its display style to "block", and sets its "aria-modal" attribute to "true" to make it visible and accessible.
+ *
+ * It also creates a backdrop element, adds the appropriate classes to it, and appends it to the body of the document.
+ *
+ * It then selects all elements with the 'data-bs-dismiss="modal"' attribute (i.e., the close buttons) and adds a click event listener to each of them.
+ *
+ * When a close button is clicked, it removes the "show" class from 'modalContainer', sets its display style to "none", removes its "aria-modal" attribute, and removes the backdrop from the body of the document.
+ * It also removes the click event listener from the clicked button.
+ */
+
 const showModal = (data) => {
   console.log("Showing modal:", data);
   const modalHTML = `<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h1 class="modal-title fs-5" id="staticBackdropLabel">${
