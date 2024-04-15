@@ -1,4 +1,4 @@
-import { showToast } from "./utils.js";
+// import { showToast } from "./utils.js";
 
 console.clear();
 
@@ -6,6 +6,7 @@ console.clear();
 let file = null;
 
 // ----------------- DOM Elements ----------------- //
+const toastContainer = document.getElementById("main-toast-container");
 const selectAudioButton = document.getElementById("select-audio");
 const selectAudioButtonText = document.getElementById("select-audio-text");
 const uploadAudioButton = document.getElementById("upload-audio");
@@ -237,3 +238,62 @@ function cacheFile(file) {
     });
   }
 }
+
+// ----------------- Show Toast ----------------- //
+/**
+ * This function displays a toast notification and plays an audio alert based on the type of the notification.
+ *
+ * It takes an object 'data' as an argument, which should contain the following properties:
+ * - type: The type of the notification. It can be "error", "success", or "info".
+ * - title: The title of the notification.
+ * - message: The message of the notification.
+ * - time: The time when the notification was created. If not provided, "just now" is used.
+ * - delay: The delay in milliseconds before the toast notification automatically hides. If not provided, 5000 (5 seconds) is used.
+ *
+ * Based on the 'type', it plays an audio alert. If an error occurs while playing the audio, it logs the error to the console.
+ *
+ * It then creates a new toast notification with the provided 'title', 'message', 'time', and 'delay'. The color of the text in the toast notification is red if the 'type' is "error", and black otherwise.
+ *
+ * If there are any toast notifications that are hidden and faded, it removes them from the DOM.
+ *
+ * Finally, it shows the new toast notification.
+ */
+
+const showToast = (data) => {
+  try {
+    if (data.type === "error") {
+      const errorAudio = new Audio("../audio/error.mp3");
+      errorAudio.play();
+    } else if (data.type === "success") {
+      const successAudio = new Audio("../audio/success.mp3");
+      successAudio.play();
+    } else if (data.type === "info") {
+      const infoAudio = new Audio("../audio/info.mp3");
+      infoAudio.play();
+    }
+  } catch (error) {
+    console.error("Error playing audio", error);
+  }
+
+  const toastHTML = `<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="color: ${
+    data.type === "error" ? "#cf4444" : "black"
+  }"><div class="toast-header"><img src="" class="rounded me-2" alt=""><strong class="me-auto">${
+    data.title
+  }</strong><small class="text-muted">${
+    data.time || "just now"
+  }</small><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div><div class="toast-body">${
+    data.message
+  }</div></div>`;
+
+  const toastElement = new DOMParser().parseFromString(toastHTML, "text/html")
+    .body.firstChild;
+  const toast = new bootstrap.Toast(toastContainer.appendChild(toastElement), {
+    delay: data.delay || 5000,
+  });
+
+  const elementsToRemove = document.querySelectorAll("div.toast.fade.hide");
+
+  elementsToRemove.forEach((element) => element.remove());
+
+  toast.show();
+};
