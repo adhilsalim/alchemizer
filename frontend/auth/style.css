@@ -15,6 +15,15 @@ body {
   margin: -20px 0 50px;
 }
 
+#background-video {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -100;
+}
+
 h1 {
   font-weight: bold;
   margin: 0;
@@ -45,8 +54,8 @@ a {
 
 .auth-button-container button {
   border-radius: 20px;
-  border: 1px solid #ff4b2b;
-  background-color: #ff4b2b;
+  border: 1px solid #8500ff;
+  background-color: #8500ff;
   color: #ffffff;
   font-size: 12px;
   font-weight: bold;
@@ -160,9 +169,9 @@ input {
 }
 
 .overlay {
-  background: #ff416c;
-  background: -webkit-linear-gradient(to right, #ff4b2b, #ff416c);
-  background: linear-gradient(to right, #ff4b2b, #ff416c);
+  background: #8500ff;
+  background: -webkit-linear-gradient(to right, #8500ff, #de00ff);
+  background: linear-gradient(to right, #8500ff, #de00ff);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
