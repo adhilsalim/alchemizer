@@ -1,15 +1,7 @@
-/**
- * Sound Effect Credits:
- * <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=140883">UNIVERSFIELD</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=140883">Pixabay</a>
- * <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=126515">UNIVERSFIELD</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=126515">Pixabay</a>
- * <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=143022">UNIVERSFIELD</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=143022">Pixabay</a>
- * <a href="https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=87963">Pixabay</a>
- * <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=132470">UNIVERSFIELD</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=132470">Pixabay</a>
- */
-
 // import { showToast, showModal } from "./utils.js";
 
 // ----------------- Clear Console ----------------- //
+
 console.clear();
 
 // ----------------- Global Variables -----------------//
@@ -38,16 +30,16 @@ const stemDict = {
 };
 
 let selectedStems = "2stems";
-
+let isLoggedIn = true;
 const serverIP = "http://localhost:5000";
 
 //----------------- DOM Elements -----------------//
+
 const toastContainer = document.getElementById("main-toast-container");
 const modalContainer = document.getElementById("main-modal-container");
 const welcomeTitle = document.querySelector("#welcome-title");
 const welcomeSubtitle = document.querySelector("#welcome-subtitle");
 const separateAudioButton = document.getElementById("separate-audio");
-// const MainAudioPlayer = document.querySelector("#main-audio-player");
 const MainAudioPlayerContainer = document.querySelector(
   "#main-audio-player-container"
 );
@@ -59,13 +51,16 @@ const audioSeparationContainer = document.getElementById(
   "audio-separation-container"
 );
 // ----------------- Welcome Message ----------------- //
+
 welcomeTitle.textContent = `Hello, ${getUserName("first")}`;
 welcomeSubtitle.textContent = `Welcome back to your studio`;
 
 // ----------------- Load Selected Audio ----------------- //
+
 loadSelectedAudio(localStorage.getItem("upload_audio_cache"));
 
 // ----------------- Load Audio Example Attributes ----------------- //
+
 document.querySelector("#audio_example_container_1 .card-title").textContent =
   audioExample.example_audio_1.title;
 document.querySelector("#audio_example_container_1 .card-text").textContent =
@@ -135,7 +130,6 @@ function showToast(data) {
   });
 
   const elementsToRemove = document.querySelectorAll("div.toast.fade.hide");
-
   elementsToRemove.forEach((element) => element.remove());
 
   toast.show();
@@ -202,8 +196,33 @@ function showModal(data) {
   });
 }
 
-// ----------------- Get Stems ----------------- //
+// ----------------- separateAudioButton Event Listener ----------------- //
+/**
+ * This event listener is triggered when the 'separateAudioButton' is clicked.
+ *
+ * Upon clicking, it first checks if the user is logged in. If the user is not logged in,
+ * it redirects the user to the authentication page and returns.
+ *
+ * If the user is logged in, it creates a dropdown menu with options for selecting the number
+ * of stems. Stems are groups of audio sources that are mixed together to create a cohesive
+ * musical piece. The options are "2 stems", "4 stems", and "5 stems".
+ *
+ * It then displays a modal dialog with the title "Select Stems", the dropdown menu as the body,
+ * the JavaScript function 'getStems()' as the action function to be executed when the action
+ * button is clicked, the text "Continue" on the action button, and the modal set to automatically
+ * close when the action button is clicked.
+ *
+ * This event listener is typically used to allow the user to select the number of stems before
+ * separating the audio.
+ */
+
 separateAudioButton.addEventListener("click", () => {
+  console.log("Separate Audio Clicked");
+  if (!isLoggedIn) {
+    window.location.href = "http://localhost:3000/auth";
+    return;
+  }
+
   let modalHTml = `<div class="dropdown">
   <p>stems are groups of audio sources that are mixed together to create a cohesive musical piece.</p>
   <ul>
@@ -229,6 +248,21 @@ separateAudioButton.addEventListener("click", () => {
   });
 });
 
+// ----------------- Select Stems ----------------- //
+/**
+ * This function is used to select the number of stems and update the dropdown button text accordingly.
+ *
+ * It takes an integer 'stems' as an argument, which represents the number of stems selected by the user.
+ *
+ * The function first assigns the 'stems' argument to the global variable 'selectedStems' and logs a message
+ * to the console with the selected number of stems.
+ *
+ * It then selects the dropdown button with the ID 'stem-dropdown-btn' and updates its text content to
+ * "Select Stems: {selectedStems}", where "{selectedStems}" is the number of stems selected by the user.
+ *
+ * This function is typically used as the callback function for the 'change' event of the stem selection dropdown.
+ */
+
 function selectStem(stems) {
   selectedStems = stems;
   console.log("Select Stems:", selectedStems);
@@ -237,6 +271,31 @@ function selectStem(stems) {
     "stem-dropdown-btn"
   ).textContent = `Select Stems: ${selectedStems}`;
 }
+
+// ----------------- Get Stems ----------------- //
+/**
+ * This function separates the uploaded audio into different stems and displays them in the audio separation section.
+ *
+ * It first displays the audio separation loader and shows a toast notification with the title "Separating Audio 🎶",
+ * the type "info", the message "This may take a few minutes<br>Wait until we bake your music!", and a delay of 10 seconds.
+ *
+ * It then makes a fetch request to the server's '/separate-audio' endpoint with the filename and the number of stems as query parameters.
+ * The filename is retrieved from the local storage under the key 'upload_audio_cache', and the number of stems is the global variable 'selectedStems'.
+ *
+ * If the fetch request is successful, it hides the audio separation loader and clears the innerHTML of 'audioSeparationContainer'.
+ *
+ * It then logs a message to the console with the stems to get and makes a fetch request for each stem to the server's '/load-audio' endpoint with the filename,
+ * the filetype "stem", and the stem name as query parameters.
+ *
+ * If the fetch request for a stem is successful, it creates a blob from the response, creates a URL representing the blob, and creates the HTML for the audio player
+ * with the blob URL as the source. It then parses the HTML string into a DOM node and appends it to 'audioSeparationContainer'.
+ *
+ * After all stems have been fetched, it logs a success message to the console and shows a toast notification with the title "Audio Separated 🎉", the type "success",
+ * the message "Audio separated successfully. You can find them in the audio separation section.", and a delay of 10 seconds.
+ *
+ * If an error occurs during the fetch request to '/separate-audio' or during the fetch request for a stem, it logs the error to the console and shows a toast notification
+ * with the title "Error Separating Audio 💔", the type "error", the message "Error separating audio", and a delay of 5 seconds.
+ */
 
 function getStems() {
   audioSeparationLoader.style.display = "block";
@@ -308,6 +367,33 @@ function getStems() {
 }
 
 // ----------------- Get Selected Audio ----------------- //
+/**
+ * This asynchronous function loads the selected audio file from the server and displays it in the main audio player.
+ *
+ * It takes a string 'fileName' as an argument, which represents the name of the audio file to load.
+ *
+ * If 'fileName' is provided, it first shows a toast notification with the title "Loading Audio", the type "info",
+ * the message "Loading {fileName}", and a delay of 3 seconds.
+ *
+ * It then makes a fetch request to the server's '/load-audio' endpoint with 'fileName' as a query parameter.
+ *
+ * If the fetch request is successful, it logs the headers of the response to the console, creates a blob from the response,
+ * creates a URL representing the blob, and sets the innerHTML of 'MainAudioPlayerContainer' to the HTML for the audio player
+ * with the blob URL as the source.
+ *
+ * It then logs a message to the console with the blob URL and sets the title of the main audio to the title of the audio file
+ * retrieved from the server. If the title is "Unknown", it sets the title to the name of the file without the extension.
+ *
+ * Finally, it shows a toast notification with the title "Audio Loaded 🎉", the type "info", the message "Selected audio loaded successfully.",
+ * and a delay of 3 seconds.
+ *
+ * If the fetch request is not successful or an error occurs during the fetch request, it shows a toast notification with the title "Error Loading Audio 😓",
+ * the type "error", the message "Internal server error. Please try again later.", and a delay of 5 seconds, and throws an error.
+ *
+ * If 'fileName' is not provided, it shows a toast notification with the title "No Audio Found 🔎", the type "error", the message "No audio found",
+ * and a delay of 5 seconds, and logs a message to the console.
+ */
+
 async function loadSelectedAudio(fileName) {
   if (fileName) {
     try {
@@ -370,6 +456,22 @@ async function loadSelectedAudio(fileName) {
 }
 
 // ----------------- Get Audio Title ----------------- //
+/**
+ * This asynchronous function fetches the title of the specified audio file from the server.
+ *
+ * It takes a string 'fileName' as an argument, which represents the name of the audio file.
+ *
+ * If 'fileName' is provided, it makes a fetch request to the server's '/get-audio-title' endpoint with 'fileName' as a query parameter.
+ *
+ * If the fetch request is successful, it logs the JSON data from the response to the console, logs the title of the audio to the console,
+ * and returns the title.
+ *
+ * If the fetch request is not successful or an error occurs during the fetch request, it shows a toast notification with the title "Error Fetching Audio Title 😓",
+ * the type "error", the message "Internal server error. Please try again later.", and a delay of 5 seconds, logs the error to the console, and returns null.
+ *
+ * This function is typically used to fetch the title of the audio file after it has been uploaded to the server.
+ */
+
 async function getAudioTitle(fileName) {
   try {
     const response = await fetch(
@@ -391,6 +493,25 @@ async function getAudioTitle(fileName) {
   }
 }
 // ----------------- Data URI to Blob ----------------- //
+/**
+ * This function converts a data URI to a Blob object.
+ *
+ * It takes a string 'dataURI' as an argument, which represents the data URI to convert.
+ *
+ * The function first splits the 'dataURI' by the comma (',') to separate the base64 encoded data from the MIME type.
+ * It then decodes the base64 data into a binary string using the 'atob()' function.
+ *
+ * It also splits the MIME type part of the 'dataURI' by the colon (':') and the semicolon (';') to get the actual MIME type.
+ *
+ * It then creates an ArrayBuffer of the same length as the binary string and a new Uint8Array view for the buffer.
+ *
+ * It iterates over the binary string and sets each byte in the Uint8Array to the char code of the corresponding character in the binary string.
+ *
+ * Finally, it creates a new Blob object from the ArrayBuffer and the MIME type and returns it.
+ *
+ * This function is typically used to convert a data URI (e.g., a base64 encoded image) to a Blob object for further processing or storage.
+ */
+
 function dataURItoBlob(dataURI) {
   const byteString = atob(dataURI.split(",")[1]);
   const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
@@ -403,6 +524,25 @@ function dataURItoBlob(dataURI) {
 }
 
 // ----------------- Get User Name ----------------- //
+/**
+ * This function retrieves the user's name from local storage and returns it in the specified format.
+ *
+ * It takes a string 'method' as an argument, which specifies the format of the name to return.
+ * The possible values are "first" for the first name, "middle" for the middle name, "last" for the last name,
+ * and "full" for the full name. If 'method' is not provided or does not match any of these values, the function
+ * returns the full name.
+ *
+ * The function first retrieves the user's full name from local storage under the key 'user_full_name'.
+ * If the name is not found (i.e., it is null), the function returns the string "User".
+ *
+ * If the name is found, the function splits it into words by the space character and returns the word
+ * corresponding to the specified 'method'. If 'method' is "first", it returns the first word. If 'method'
+ * is "middle", it returns the second word. If 'method' is "last", it returns the third word. If 'method'
+ * is "full" or does not match any of the specified values, it returns the full name.
+ *
+ * This function is typically used to display the user's name in the user interface.
+ */
+
 function getUserName(method) {
   let userName = localStorage.getItem("user_full_name");
 
@@ -423,8 +563,44 @@ function getUserName(method) {
 }
 
 // ----------------- Load Audio Template ----------------- //
+/**
+ * This function loads an audio template into the audio player.
+ *
+ * It takes a string 'template' as an argument, which represents the key of the audio template to load.
+ *
+ * The function first logs the audio template object to the console for debugging purposes.
+ *
+ * It then calls the 'loadSelectedAudio()' function with the filename of the audio template as an argument.
+ * The 'loadSelectedAudio()' function is responsible for fetching the audio file from the server and displaying
+ * it in the audio player.
+ *
+ * Finally, the function stores the filename of the audio template in local storage under the key 'upload_audio_cache'.
+ * This allows the filename to be retrieved later without having to fetch it from the server again.
+ *
+ * This function is typically used to load a predefined audio template when the user selects it from a list of available templates.
+ */
+
 function loadAudioTemplate(template) {
   console.log(audioExample[template]);
   loadSelectedAudio(audioExample[template].fileName);
   localStorage.setItem("upload_audio_cache", audioExample[template].fileName);
+}
+
+// ----------------- Set User Name ----------------- //
+/**
+ * This function stores the user's name in local storage.
+ *
+ * It takes a string 'username' as an argument, which represents the user's full name.
+ *
+ * The function simply calls the 'setItem()' method of the 'localStorage' object with the key 'user_full_name'
+ * and the 'username' argument. This stores the 'username' in local storage under the key 'user_full_name'.
+ *
+ * The stored name can be retrieved later using the 'getItem()' method of the 'localStorage' object with the
+ * key 'user_full_name'.
+ *
+ * This function is typically used to store the user's name after they have logged in or updated their name.
+ */
+
+function setUserName(username) {
+  localStorage.setItem("user_full_name", username);
 }
