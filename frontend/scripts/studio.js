@@ -6,7 +6,7 @@ console.clear();
 
 // ----------------- Global Variables -----------------//
 
-const audioExample = {
+const AUDIO_EXAMPLE = {
   example_audio_1: {
     fileName: "naan_yen.mp3",
     title: "Naan Yen",
@@ -23,7 +23,7 @@ const audioExample = {
   },
 };
 
-const stemDict = {
+const STEM_DICT = {
   "2stems": ["vocals", "accompaniment"],
   "4stems": ["vocals", "drums", "bass", "other"],
   "5stems": ["vocals", "drums", "bass", "piano", "other"],
@@ -31,7 +31,11 @@ const stemDict = {
 
 let selectedStems = "2stems";
 let isLoggedIn = true;
-const serverIP = "http://localhost:5000";
+let WARNINGS = {
+  showOnAudioSeparation: false,
+  showOnAudioConversion: false,
+};
+const SERVER_IP = "http://localhost:5000";
 
 //----------------- DOM Elements -----------------//
 
@@ -40,6 +44,7 @@ const modalContainer = document.getElementById("main-modal-container");
 const welcomeTitle = document.querySelector("#welcome-title");
 const welcomeSubtitle = document.querySelector("#welcome-subtitle");
 const separateAudioButton = document.getElementById("separate-audio");
+const convertAudioButton = document.getElementById("convert-audio");
 const MainAudioPlayerContainer = document.querySelector(
   "#main-audio-player-container"
 );
@@ -62,20 +67,20 @@ loadSelectedAudio(localStorage.getItem("upload_audio_cache"));
 // ----------------- Load Audio Example Attributes ----------------- //
 
 document.querySelector("#audio_example_container_1 .card-title").textContent =
-  audioExample.example_audio_1.title;
+  AUDIO_EXAMPLE.example_audio_1.title;
 document.querySelector("#audio_example_container_1 .card-text").textContent =
-  audioExample.example_audio_1.duration;
+  AUDIO_EXAMPLE.example_audio_1.duration;
 document
   .querySelector("#audio_example_container_1 .card-text")
-  .setAttribute("title", audioExample.example_audio_1.singers);
+  .setAttribute("title", AUDIO_EXAMPLE.example_audio_1.singers);
 
 document.querySelector("#audio_example_container_2 .card-title").textContent =
-  audioExample.example_audio_2.title;
+  AUDIO_EXAMPLE.example_audio_2.title;
 document.querySelector("#audio_example_container_2 .card-text").textContent =
-  audioExample.example_audio_2.duration;
+  AUDIO_EXAMPLE.example_audio_2.duration;
 document
   .querySelector("#audio_example_container_2 .card-text")
-  .setAttribute("title", audioExample.example_audio_2.singers);
+  .setAttribute("title", AUDIO_EXAMPLE.example_audio_2.singers);
 
 // ----------------- Show Toast ----------------- //
 /**
@@ -223,7 +228,17 @@ separateAudioButton.addEventListener("click", () => {
     return;
   }
 
-  let modalHTml = `<div class="dropdown">
+  if (WARNINGS.showOnAudioSeparation) {
+    let modalHTML = `<div><p>You have existing stems. This action will overwrite them. Save your stems before proceeding.</p></div>`;
+    showModal({
+      title: "Separate Audio",
+      body: modalHTML,
+      actionFunction: "setWarning('showOnAudioSeparation', false)",
+      autoClose: true,
+      actionButtonText: "Saved",
+    });
+  } else {
+    let modalHTml = `<div class="dropdown">
   <p>stems are groups of audio sources that are mixed together to create a cohesive musical piece.</p>
   <ul>
   <li>2-stems: vocals + accompaniment</li>
@@ -239,13 +254,14 @@ separateAudioButton.addEventListener("click", () => {
     <li class="dropdown-item" onclick="selectStem('5stems')">5 stems</li>
   </ul>
 </div>`;
-  showModal({
-    title: "Select Stems",
-    body: modalHTml,
-    actionFunction: "getStems()",
-    autoClose: true,
-    actionButtonText: "Continue",
-  });
+    showModal({
+      title: "Select Stems",
+      body: modalHTml,
+      actionFunction: "getStems()",
+      autoClose: true,
+      actionButtonText: "Continue",
+    });
+  }
 });
 
 // ----------------- Select Stems ----------------- //
@@ -307,21 +323,21 @@ function getStems() {
   });
 
   fetch(
-    `${serverIP}/separate-audio?filename=${localStorage.getItem(
+    `${SERVER_IP}/separate-audio?filename=${localStorage.getItem(
       "upload_audio_cache"
     )}&stems=${selectedStems}`
   )
     .then((response) => response.json())
     .then((data) => {
+      WARNINGS.showOnAudioSeparation = true;
       audioSeparationLoader.style.display = "none";
-
       audioSeparationContainer.innerHTML = "";
 
-      console.log("getting stems:", stemDict[selectedStems]);
-      stemDict[selectedStems].forEach((stem) => {
+      console.log("getting stems:", STEM_DICT[selectedStems]);
+      STEM_DICT[selectedStems].forEach((stem) => {
         (async () => {
           const response = await fetch(
-            `${serverIP}/load-audio?filename=${localStorage
+            `${SERVER_IP}/load-audio?filename=${localStorage
               .getItem("upload_audio_cache")
               .replace(".mp3", "")
               .replace(".wav", "")}&filetype=${"stem"}&stemname=${stem}`
@@ -404,7 +420,7 @@ async function loadSelectedAudio(fileName) {
         delay: 3000,
       });
       const response = await fetch(
-        `${serverIP}/load-audio?filename=${fileName}`
+        `${SERVER_IP}/load-audio?filename=${fileName}`
       );
       if (response.ok) {
         console.log("headers:", ...response.headers);
@@ -475,7 +491,7 @@ async function loadSelectedAudio(fileName) {
 async function getAudioTitle(fileName) {
   try {
     const response = await fetch(
-      `${serverIP}/get-audio-title?filename=${fileName}`
+      `${SERVER_IP}/get-audio-title?filename=${fileName}`
     );
     const data = await response.json();
     console.log(data);
@@ -581,9 +597,9 @@ function getUserName(method) {
  */
 
 function loadAudioTemplate(template) {
-  console.log(audioExample[template]);
-  loadSelectedAudio(audioExample[template].fileName);
-  localStorage.setItem("upload_audio_cache", audioExample[template].fileName);
+  console.log(AUDIO_EXAMPLE[template]);
+  loadSelectedAudio(AUDIO_EXAMPLE[template].fileName);
+  localStorage.setItem("upload_audio_cache", AUDIO_EXAMPLE[template].fileName);
 }
 
 // ----------------- Set User Name ----------------- //
@@ -603,4 +619,59 @@ function loadAudioTemplate(template) {
 
 function setUserName(username) {
   localStorage.setItem("user_full_name", username);
+}
+
+// ----------------- Convert Audio Button Event Listener ----------------- //
+convertAudioButton.addEventListener("click", () => {
+  console.log("Convert Audio Clicked");
+  if (!isLoggedIn) {
+    window.location.href = "http://localhost:3000/auth";
+    return;
+  }
+
+  if (WARNINGS.showOnAudioConversion) {
+    let modalHTML = `<div><p>You have existing converted audio files. This action will overwrite them. Save your audio files before proceeding.</p></div>`;
+    showModal({
+      title: "Convert Audio",
+      body: modalHTML,
+      actionFunction: "setWarning('showOnAudioConversion', false)",
+      autoClose: true,
+      actionButtonText: "Saved",
+    });
+  } else {
+    let modalHTml = `<div class="dropdown">
+  <p>stems are groups of audio sources that are mixed together to create a cohesive musical piece.</p>
+  <ul>
+  <li>2-stems: vocals + accompaniment</li>
+  <li>4-stems: vocals + drum + bass + other</li>
+  <li>5-stems: vocals + drums + bass + piano + other</li>
+  </ul>
+  <br>
+  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="stem-dropdown-btn">
+    Select Stems: ${selectedStems}</button>
+  <ul class="dropdown-menu" id="stem-dropdown-menu">
+    <li class="dropdown-item" onclick="selectStem('2stems')">2 stems</li>
+    <li class="dropdown-item" onclick="selectStem('4stems')">4 stems</li>
+    <li class="dropdown-item" onclick="selectStem('5stems')">5 stems</li>
+  </ul>
+</div>`;
+  }
+});
+
+// ----------------- Set Warning ----------------- //
+/**
+ * This function sets a warning in the WARNINGS object.
+ *
+ * It takes two arguments: a string 'warning', which represents the key of the warning, and a boolean 'value',
+ * which represents the value of the warning.
+ *
+ * The function simply assigns the 'value' to the 'warning' key in the WARNINGS object. If the 'warning' key
+ * does not exist in the WARNINGS object, it is created.
+ *
+ * This function is typically used to set the state of various warnings in the application. The WARNINGS object
+ * can then be checked at various points in the application to determine whether to display certain warnings to the user.
+ */
+
+function setWarning(warning, value) {
+  WARNINGS[warning] = value;
 }
