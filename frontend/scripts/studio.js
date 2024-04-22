@@ -30,6 +30,7 @@ const STEM_DICT = {
 };
 
 let selectedStems = "2stems";
+let selectedConversionMode = "WebGL";
 let isLoggedIn = true;
 let WARNINGS = {
   showOnAudioSeparation: false,
@@ -259,7 +260,7 @@ separateAudioButton.addEventListener("click", () => {
       body: modalHTml,
       actionFunction: "getStems()",
       autoClose: true,
-      actionButtonText: "Continue",
+      actionButtonText: "Separate",
     });
   }
 });
@@ -640,23 +641,39 @@ convertAudioButton.addEventListener("click", () => {
     });
   } else {
     let modalHTml = `<div class="dropdown">
-  <p>stems are groups of audio sources that are mixed together to create a cohesive musical piece.</p>
+  <p>Convert your audio to an instrument,<br><br>If you select WebGL, you have to specify the instrument to be converted, also it requires a GPU.<br><br>If you select Google Host, you don't need to specify the instrument, but it can take longer to convert.</p>
   <ul>
-  <li>2-stems: vocals + accompaniment</li>
-  <li>4-stems: vocals + drum + bass + other</li>
-  <li>5-stems: vocals + drums + bass + piano + other</li>
+  <li>WebGL (experimental) </li>
+  <li>Google Host (recommended)</li>
   </ul>
   <br>
-  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="stem-dropdown-btn">
-    Select Stems: ${selectedStems}</button>
-  <ul class="dropdown-menu" id="stem-dropdown-menu">
-    <li class="dropdown-item" onclick="selectStem('2stems')">2 stems</li>
-    <li class="dropdown-item" onclick="selectStem('4stems')">4 stems</li>
-    <li class="dropdown-item" onclick="selectStem('5stems')">5 stems</li>
+  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="conversion-mode-dropdown-btn">
+    Selected : ${selectedConversionMode}</button>
+  <ul class="dropdown-menu" id="conversion-mode-dropdown-menu">
+    <li class="dropdown-item" onclick="selectConversionMode('WebGL')">WebGL</li>
+    <li class="dropdown-item" onclick="selectConversionMode('Google Host')">Google Host</li>
   </ul>
 </div>`;
+
+    showModal({
+      title: "Select Conversion Mode",
+      body: modalHTml,
+      actionFunction: "convertAudio()",
+      autoClose: true,
+      actionButtonText: "Convert",
+    });
   }
 });
+
+// ----------------- Set Conversion Mode ----------------- //
+function selectConversionMode(mode) {
+  selectedConversionMode = mode;
+  console.log("Select Conversion Mode:", selectedConversionMode);
+
+  document.getElementById(
+    "conversion-mode-dropdown-btn"
+  ).textContent = `Selected : ${selectedConversionMode}`;
+}
 
 // ----------------- Set Warning ----------------- //
 /**

@@ -218,3 +218,7 @@ h1 {
 .card-control-icon:hover {
   background-color: #8500ff;
 }
+
+.dropdown-menu .dropdown-item {
+  cursor: pointer;
+}
