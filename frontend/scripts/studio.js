@@ -803,7 +803,7 @@ songSearchButton.addEventListener("click", () => {
           songSearchContainer.innerHTML = "";
           let songHTML = "";
           data.items.forEach((song) => {
-            songHTML += `<article class="search_results__card">
+            songHTML = `<article class="search_results__card">
         <div class="search_results__image">
             <img src="${song.snippet.thumbnails.medium.url}" alt="${song.snippet.title}"
                 class="search_results__img">
@@ -814,13 +814,13 @@ songSearchButton.addEventListener("click", () => {
         </div>
     </article>`;
 
-            // const songDocument = new DOMParser().parseFromString(
-            //   songHTML,
-            //   "text/html"
-            // );
-            // songSearchContainer.appendChild(songDocument.body.firstChild);
+            const songDocument = new DOMParser().parseFromString(
+              songHTML,
+              "text/html"
+            );
+            songSearchContainer.appendChild(songDocument.body.firstChild);
           });
-          songSearchContainer.innerHTML = songHTML;
+          // songSearchContainer.innerHTML = songHTML;
           songSearchQueryText.textContent = `Showing results for "${songSearchInput.value}"`;
         }
       })
