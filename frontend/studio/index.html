@@ -79,7 +79,7 @@
         <div class="container" style="padding-top: 50px; padding-bottom: 50px;">
             <div class="row" data-aos="zoom-out-up">
                 <div class="col-6 align-self-center">
-                    <p class="display-4" id="control-section-title"><span>Audio</span> Management</p>
+                    <p class="display-4 control-section-title"><span>Audio</span> Management</p>
                     <p style="margin-right: 100px;">This section allows you to manage your audio files. select 'separate
                         audio' to get
                         stems of the
@@ -116,7 +116,7 @@
         <div class="container" style="padding-top: 50px; padding-bottom: 50px;">
             <div class="row" data-aos="zoom-out-up">
                 <div class="col-6 align-self-center">
-                    <p class="display-4" id="control-section-title"><span>Audio</span> Separation</p>
+                    <p class="display-4 control-section-title"><span>Audio</span> Separation</p>
                     <p style="margin-right: 100px;">Find your separated audio files here. You can either download or
                         convert the audio files.</p>
                 </div>
@@ -141,7 +141,7 @@
         <div class="container" style="padding-top: 50px; padding-bottom: 50px;">
             <div class="row" data-aos="zoom-out-up">
                 <div class="col-6 align-self-center">
-                    <p class="display-4" id="control-section-title"><span>Audio</span> Conversion</p>
+                    <p class="display-4 control-section-title"><span>Audio</span> Conversion</p>
                     <p style="margin-right: 100px;">Find your converted audio files here. You can download these files
                         directly and use them in your projects.</p>
                 </div>
@@ -161,6 +161,63 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="container" style="padding-top: 50px; padding-bottom: 50px;">
+            <div class="row" data-aos="zoom-out-up">
+                <div class="col-6 align-self-center">
+                    <p class="display-4 control-section-title"><span>Search</span> Songs</p>
+                    <p style="margin-right: 100px;">Search songs easily with the search bar. You can play them directly
+                        here</p>
+                </div>
+                <div class="col-6">
+                    <div class="row" id="audio-conversion-loader" style="display: none; margin-bottom: 10px;">
+                        <div class="row text-center">
+                            <div class="text-center">
+                                <div class=" spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Search" aria-label="Search"
+                                aria-describedby="basic-addon2" style="border-radius: 15px; margin-right: 10px;"
+                                maxlength="50" id="song-search-input">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-primary" type="button" id="song-search-button"
+                                    style="border-radius: 20px;">Search</button>
+                            </div>
+                        </div>
+                        <p>Showing results for Aavesham</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row" data-aos="zoom-in-up">
+                <section class="search_results section" id="search_results">
+                    <div class="search_results__container container grid" id="song-search-container">
+                        <article class="search_results__card">
+                            <div class="search_results__image">
+                                <img src="https://i.ytimg.com/vi/tOM-nWPcR4U/hqdefault.jpg" alt="image"
+                                    class="search_results__img">
+                                <a href="#" class="search_results__button button">
+                                    <span class="material-symbols-outlined">
+                                        north_east
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="search_results__content">
+                                <h3 class="search_results__subtitle">Think Music India</h3>
+                                <h2 class="search_results__title">Illuminati|Aavesham|Jithu Madhavan|Fahadh
+                                    Faasil|Sushin
+                                    Shyam,Dabzee,Vinayak|
+                                    Nazriya|Anwar Rasheed
+                                </h2>
+                            </div>
+                        </article>
+                    </div>
+                </section>
             </div>
         </div>
     </div>

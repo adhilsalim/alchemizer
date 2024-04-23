@@ -3,16 +3,24 @@ from flask_cors import CORS
 from mutagen.mp3 import MP3
 import os
 import subprocess
+import requests
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes and origins
+
+# Enable CORS for all routes and origins
+CORS(app)
 
 # or, to allow only specific origins:
 # cors = CORS(app, resources={r"/*": {"origins": ["http://localhost:3000"]}})
+YOUTUBE_DATA_API_KEY = "AIzaSyAztJsKM1SNJ2xh7Zabm7ElIbnmKB4mlTE"
+YOUTUBE_DATA_ENDPOINT = "https://www.googleapis.com/youtube/v3/search"
 
+# Set the upload folder
 app.config['UPLOAD_FOLDER'] = 'uploads'
+# Set the Spleeter output folder
 app.config['SPLEETER_OUTPUT_FOLDER'] = 'spleeter_output'
 
+# Supported stem configurations
 STEM_DICT = {"2stems": ["vocals", "accompaniment"], "4stems": ["vocals", "drums", "bass", "other"], "5stems": ["vocals", "drums", "bass", "piano", "other"]}
 
 # Path to the Flask virtual environment
@@ -32,6 +40,22 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 def index():
     print('Server is running')
     return '<h1>Server is running</h1>'
+
+@app.route('/search-song', methods=['POST', 'GET'])
+def search_song():
+    print('searching song...')
+    query = request.args.get('query')
+    print('query:', query)
+    params = {
+        'part': 'snippet',
+        'q': query,
+        'type': 'video',
+        'key': YOUTUBE_DATA_API_KEY
+    }
+
+    response = requests.get(YOUTUBE_DATA_ENDPOINT, params=params)
+    print('sending response...')
+    return response.json()
 
 @app.route('/upload', methods=['POST'])
 def upload_file():

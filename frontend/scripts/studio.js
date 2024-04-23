@@ -31,6 +31,7 @@ const STEM_DICT = {
 
 let selectedStems = "2stems";
 let selectedConversionMode = "WebGL";
+let audioConversionData = null;
 let isLoggedIn = true;
 let WARNINGS = {
   audioSeparationFileExists: false,
@@ -58,6 +59,9 @@ const audioSeparationLoader = document.getElementById(
 const audioSeparationContainer = document.getElementById(
   "audio-separation-container"
 );
+const songSearchButton = document.getElementById("song-search-button");
+const songSearchInput = document.getElementById("song-search-input");
+const songSearchContainer = document.getElementById("song-search-container");
 // ----------------- Welcome Message ----------------- //
 
 welcomeTitle.textContent = `Hello, ${getUserName("first")}`;
@@ -178,7 +182,7 @@ function showModal(data) {
     }</div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
     <button type="button" class="btn btn-primary" ${
       data.autoClose ? 'data-bs-dismiss="modal" aria-label="Close"' : ""
-    } onclick="${data.actionFunction}">${
+    } onclick='${data.actionFunction}'>${
     data.actionButtonText
   }</button></div></div></div>`;
 
@@ -685,6 +689,17 @@ function setWarning(warning, value) {
 
 // ----------------- Convert Audio ----------------- //
 function convertAudio() {
+  console.log("audioConversionData", audioConversionData);
+  if (audioConversionData === null) {
+    showToast({
+      title: "Audio Data Not Found",
+      type: "error",
+      message: "Please select an audio to convert",
+      delay: 5000,
+    });
+    return;
+  }
+
   if (selectedConversionMode === "WebGL") {
     console.log("WebGL conversion");
     showToast({
@@ -713,8 +728,12 @@ function convertAudio() {
   }
 }
 
+// ----------------- Global Audio Conversion Manager ----------------- //
 function globalAudioConversionManager(data) {
   console.log("Global Audio Conversion Manager", data);
+
+  audioConversionData = data;
+
   if (WARNINGS.audioConversionInProgress) {
     let modalHTML = `<div><p>Audio conversion is in progress. Please wait until the current process is complete.</p></div>`;
     showModal({
@@ -758,4 +777,59 @@ function globalAudioConversionManager(data) {
     });
   }
 }
-// where to pass data?
+
+songSearchButton.addEventListener("click", () => {
+  if (songSearchInput.value === "") {
+    showToast({
+      title: "No Song Found",
+      type: "error",
+      message: "Please enter a song name to search",
+      delay: 5000,
+    });
+  } else {
+    fetch(`${SERVER_IP}/search-song?query=${songSearchInput.value}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        if (data.length === 0) {
+          showToast({
+            title: "No Song Found",
+            type: "error",
+            message: "No song found with the given name",
+            delay: 5000,
+          });
+        } else {
+          songSearchContainer.innerHTML = "";
+          let songHTML = "";
+          data.items.forEach((song) => {
+            songHTML += `<article class="search_results__card">
+        <div class="search_results__image">
+            <img src="https://i.ytimg.com/vi/tOM-nWPcR4U/hqdefault.jpg" alt="image"
+                class="search_results__img">
+            <a href="#" class="search_results__button button"><span class="material-symbols-outlined">north_east</span></a></div>
+        <div class="search_results__content">
+            <h3 class="search_results__subtitle">TITLE</h3>
+            <h2 class="search_results__title">TITLE</h2>
+        </div>
+    </article>`;
+
+            // const songDocument = new DOMParser().parseFromString(
+            //   songHTML,
+            //   "text/html"
+            // );
+            // songSearchContainer.appendChild(songDocument.body.firstChild);
+          });
+          songSearchContainer.innerHTML = songHTML;
+        }
+      })
+      .catch((error) => {
+        console.error("Error searching song:", error);
+        showToast({
+          title: "Error Searching Song",
+          type: "error",
+          message: "Internal server error. Please try again later.",
+          delay: 5000,
+        });
+      });
+  }
+});

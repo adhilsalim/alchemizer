@@ -1,4 +1,44 @@
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+Khojki&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+
+:root {
+  --search-result-header-height: 3.5rem;
+  --search-result-first-color: #8500ff;
+  --search-result-black-color: hsl(0, 0%, 0%);
+  --search-result-black-color-light: hsl(0, 0%, 40%);
+  --search-result-white-color: hsl(0, 0%, 95%);
+  --search-result-title-color: hsl(0, 0%, 0%);
+  --search-result-text-color: hsl(0, 0%, 35%);
+  --search-result-text-color-light: hsl(0, 0%, 64%);
+  --search-result-body-color: hsl(0, 0%, 87%);
+  --search-result-container-color: hsl(0, 0%, 100%);
+  --search-result-body-font: "Bai Jamjuree", sans-serif;
+  --search-result-biggest-font-size: 2.5rem;
+  --search-result-h1-font-size: 1.75rem;
+  --search-result-h2-font-size: 1.25rem;
+  --search-result-h3-font-size: 1.125rem;
+  --search-result-normal-font-size: 0.938rem;
+  --search-result-small-font-size: 0.813rem;
+  --search-result-smaller-font-size: 0.75rem;
+  --search-result-font-regular: 400;
+  --search-result-font-medium: 500;
+  --search-result-font-semi-bold: 600;
+  --search-result-font-bold: 700;
+  --search-result-z-tooltip: 10;
+  --search-result-z-fixed: 100;
+}
+
+@media screen and (min-width: 1150px) {
+  :root {
+    --search-result-biggest-font-size: 4.5rem;
+    --search-result-h1-font-size: 3rem;
+    --search-result-h2-font-size: 1.5rem;
+    --search-result-h3-font-size: 1.25rem;
+    --search-result-normal-font-size: 1rem;
+    --search-result-small-font-size: 0.875rem;
+    --search-result-smaller-font-size: 0.813rem;
+  }
+}
 
 body {
   font-family: Arial, sans-serif;
@@ -162,7 +202,7 @@ h1 {
   font-size: 24px;
 }
 
-#control-section-title {
+.control-section-title {
   background: linear-gradient(to right, #8500ff 20%, #de00ff 60%);
   background-clip: text;
   -webkit-background-clip: text;
@@ -226,4 +266,199 @@ h1 {
 .stem-audio-controls a {
   color: inherit;
   text-decoration: none;
+}
+
+/* search result card */
+
+.search_results__title,
+.search_results__subtitle {
+  color: var(--search-result-title-color);
+  font-weight: var(--search-result-font-bold);
+  font-family: var(--search-result-body-font);
+}
+
+.search_results__image a {
+  text-decoration: none;
+}
+
+.search_results__img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#search_results .change-theme {
+  font-size: 1.25rem;
+  color: var(--search-result-title-color);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+#search_results .container {
+  max-width: 1120px;
+  margin-inline: 1.5rem;
+}
+
+#search_results .grid {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.search_results .section {
+  padding-block: 4rem 2rem;
+}
+
+#search_results .main {
+  overflow: hidden; /* For animation ScrollReveal */
+}
+
+#search_results .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 0.5rem;
+  background-color: var(--search-result-black-color);
+  padding: 1.1rem 1.5rem;
+  color: var(--search-result-white-color);
+  font-weight: var(--search-result-font-medium);
+  border-radius: 0.75rem;
+  transition: background-color 0.4s;
+}
+
+#search_results .button i {
+  font-size: 1.25rem;
+}
+
+#search_results .button:hover {
+  background-color: var(--search-result-first-color);
+}
+
+/*=============== search_results ===============*/
+.search_results {
+  background-color: var(--search-result-container-color);
+  transition: background-color 0.4s;
+}
+
+.search_results__container {
+  row-gap: 2rem;
+}
+
+.search_results__card {
+  padding: 1rem 1rem 2rem;
+  border-radius: 0.75rem;
+  transition: background-color 0.4s;
+}
+
+.search_results__image {
+  position: relative;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  height: 180px;
+}
+
+.search_results__img {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 24px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.search_results__button {
+  position: absolute;
+  right: 1rem;
+  bottom: 1.5rem;
+  padding: 1rem;
+  z-index: 1;
+}
+
+.search_results__content {
+  margin-bottom: 1.25rem;
+}
+
+.search_results__subtitle {
+  position: relative;
+  display: inline-block;
+  font-size: var(--search-result-small-font-size);
+  font-weight: var(--search-result-font-medium);
+  color: var(--search-result-text-color);
+  margin-bottom: 0.75rem;
+  padding-left: 1.75rem;
+}
+
+.search_results__subtitle::after {
+  content: "";
+  width: 20px;
+  height: 1px;
+  background-color: var(--search-result-text-color);
+  position: absolute;
+  left: 0;
+  top: 50%;
+}
+
+.search_results__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+  font-size: var(--search-result-h3-font-size);
+  margin-bottom: 0.75rem;
+}
+
+.search_results__buttons {
+  display: flex;
+  align-items: center;
+  column-gap: 1rem;
+}
+
+.search_results__card:hover {
+  background-color: var(--search-result-white-color);
+  border-radius: 0.75rem;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 24px;
+}
+
+/* For medium devices */
+@media screen and (min-width: 576px) {
+  .search_results__container {
+    grid-template-columns: 350px;
+    justify-content: center;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .search_results__container {
+    grid-template-columns: repeat(2, 350px);
+  }
+}
+
+/* For large devices */
+@media screen and (min-width: 1150px) {
+  .container {
+    margin-inline: auto;
+  }
+  .section {
+    padding-block: 7rem 2rem;
+  }
+  .section__title-1::after,
+  .section__title-2::after {
+    width: 70px;
+    height: 48px;
+  }
+  .search_results__container {
+    grid-template-columns: repeat(3, 352px);
+    padding-block: 3rem 1rem;
+  }
+  .search_results__card {
+    padding: 1.25rem 1.25rem 2.5rem;
+  }
+  .search_results__image {
+    margin-bottom: 1rem;
+  }
+  .search_results__content {
+    margin-bottom: 2rem;
+  }
+  .search_results__buttons {
+    right: 1.25rem;
+  }
 }
