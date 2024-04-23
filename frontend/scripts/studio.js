@@ -62,6 +62,7 @@ const audioSeparationContainer = document.getElementById(
 const songSearchButton = document.getElementById("song-search-button");
 const songSearchInput = document.getElementById("song-search-input");
 const songSearchContainer = document.getElementById("song-search-container");
+const songSearchQueryText = document.getElementById("song-search-query-text");
 // ----------------- Welcome Message ----------------- //
 
 welcomeTitle.textContent = `Hello, ${getUserName("first")}`;
@@ -804,12 +805,12 @@ songSearchButton.addEventListener("click", () => {
           data.items.forEach((song) => {
             songHTML += `<article class="search_results__card">
         <div class="search_results__image">
-            <img src="https://i.ytimg.com/vi/tOM-nWPcR4U/hqdefault.jpg" alt="image"
+            <img src="${song.snippet.thumbnails.medium.url}" alt="${song.snippet.title}"
                 class="search_results__img">
-            <a href="#" class="search_results__button button"><span class="material-symbols-outlined">north_east</span></a></div>
+            <a href="https://www.youtube.com/watch?v=${song.id.videoId}" class="search_results__button button"><span class="material-symbols-outlined">north_east</span></a></div>
         <div class="search_results__content">
-            <h3 class="search_results__subtitle">TITLE</h3>
-            <h2 class="search_results__title">TITLE</h2>
+            <h3 class="search_results__subtitle">${song.snippet.channelTitle}</h3>
+            <h2 class="search_results__title">${song.snippet.title}</h2>
         </div>
     </article>`;
 
@@ -820,6 +821,7 @@ songSearchButton.addEventListener("click", () => {
             // songSearchContainer.appendChild(songDocument.body.firstChild);
           });
           songSearchContainer.innerHTML = songHTML;
+          songSearchQueryText.textContent = `Showing results for "${songSearchInput.value}"`;
         }
       })
       .catch((error) => {
