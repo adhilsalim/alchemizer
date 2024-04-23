@@ -366,13 +366,13 @@ function getStems() {
               "/" +
               stem.toString()
             }"})`;
-            audioPLayerHTML = `<div class="col-12 mt-2 mb-2"><div class="stem-audio-container">
+            const audioPLayerHTML = `<div class="col-12 mt-2 mb-2"><div class="stem-audio-container">
             <div class="stem-audio-title"> <p>${stem}</p> </div> <div class="stem-audio-player">
             <wave-audio-path-player src="${audioUrl}" wave-width="360" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' title="">
             </wave-audio-path-player> </div> 
             <div class="stem-audio-controls" style="display: flex; flex-direction: row; justify-content: end;"> 
-            <div class="card-control-icon"> <span class="material-symbols-outlined"> download </span> </div> 
-            <div class="card-control-icon"> <span class="material-symbols-outlined" onclick='${functionCall}'> arrow_split </span> </div> </div> </div> </div>`;
+            <a href="${audioUrl}" download="${stem}.mp3"><div class="card-control-icon"> <span class="material-symbols-outlined">download</span></div></a>
+            <div class="card-control-icon"><span class="material-symbols-outlined" onclick='${functionCall}'>arrow_split</span></div></div></div></div>`;
 
             const htmlElement = new DOMParser().parseFromString(
               audioPLayerHTML,

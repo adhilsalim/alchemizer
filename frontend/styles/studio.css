@@ -222,3 +222,8 @@ h1 {
 .dropdown-menu .dropdown-item {
   cursor: pointer;
 }
+
+.stem-audio-controls a {
+  color: inherit;
+  text-decoration: none;
+}
