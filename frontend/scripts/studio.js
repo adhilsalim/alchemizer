@@ -33,8 +33,10 @@ let selectedStems = "2stems";
 let selectedConversionMode = "WebGL";
 let isLoggedIn = true;
 let WARNINGS = {
-  showOnAudioSeparation: false,
-  showOnAudioConversion: false,
+  audioSeparationFileExists: false,
+  audioSeparationInProgress: false,
+  audioConversionFileExists: false,
+  audioConversionInProgress: false,
 };
 const SERVER_IP = "http://localhost:5000";
 
@@ -229,12 +231,21 @@ separateAudioButton.addEventListener("click", () => {
     return;
   }
 
-  if (WARNINGS.showOnAudioSeparation) {
+  if (WARNINGS.audioSeparationInProgress) {
+    let modalHTML = `<div><p>Audio separation is in progress. Please wait until the current process is complete.</p></div>`;
+    showModal({
+      title: "Audio Separation In Progress ⚠️",
+      body: modalHTML,
+      actionFunction: "console.log('Audio separation in progress')",
+      autoClose: true,
+      actionButtonText: "Okay",
+    });
+  } else if (WARNINGS.audioSeparationFileExists) {
     let modalHTML = `<div><p>You have existing stems. This action will overwrite them. Save your stems before proceeding.</p></div>`;
     showModal({
       title: "Separate Audio",
       body: modalHTML,
-      actionFunction: "setWarning('showOnAudioSeparation', false)",
+      actionFunction: "setWarning('audioSeparationFileExists', false)",
       autoClose: true,
       actionButtonText: "Saved",
     });
@@ -323,6 +334,8 @@ function getStems() {
     delay: 10000,
   });
 
+  WARNINGS.audioSeparationInProgress = true;
+
   fetch(
     `${SERVER_IP}/separate-audio?filename=${localStorage.getItem(
       "upload_audio_cache"
@@ -330,13 +343,15 @@ function getStems() {
   )
     .then((response) => response.json())
     .then((data) => {
-      WARNINGS.showOnAudioSeparation = true;
+      WARNINGS.audioSeparationFileExists = true;
+      WARNINGS.audioSeparationInProgress = false;
       audioSeparationLoader.style.display = "none";
       audioSeparationContainer.innerHTML = "";
 
       console.log("getting stems:", STEM_DICT[selectedStems]);
       STEM_DICT[selectedStems].forEach((stem) => {
         (async () => {
+          const tempFileName = localStorage.getItem("upload_audio_cache");
           const response = await fetch(
             `${SERVER_IP}/load-audio?filename=${localStorage
               .getItem("upload_audio_cache")
@@ -346,13 +361,18 @@ function getStems() {
           if (response.ok) {
             const blob = await response.blob();
             const audioUrl = URL.createObjectURL(blob);
+            const functionCall = `globalAudioConversionManager({ type: "stem", filename: "${
+              tempFileName.replace(".mp3", "").replace(".wav", "").toString() +
+              "/" +
+              stem.toString()
+            }"})`;
             audioPLayerHTML = `<div class="col-12 mt-2 mb-2"><div class="stem-audio-container">
             <div class="stem-audio-title"> <p>${stem}</p> </div> <div class="stem-audio-player">
             <wave-audio-path-player src="${audioUrl}" wave-width="360" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' title="">
             </wave-audio-path-player> </div> 
             <div class="stem-audio-controls" style="display: flex; flex-direction: row; justify-content: end;"> 
             <div class="card-control-icon"> <span class="material-symbols-outlined"> download </span> </div> 
-            <div class="card-control-icon"> <span class="material-symbols-outlined" onclick="showToast({ title: 'Feature Coming Soon 🚀', message: 'This feature is under development and will be available soon.', type: 'info' })"> arrow_split </span> </div> </div> </div> </div>`;
+            <div class="card-control-icon"> <span class="material-symbols-outlined" onclick='${functionCall}'> arrow_split </span> </div> </div> </div> </div>`;
 
             const htmlElement = new DOMParser().parseFromString(
               audioPLayerHTML,
@@ -629,40 +649,10 @@ convertAudioButton.addEventListener("click", () => {
     window.location.href = "http://localhost:3000/auth";
     return;
   }
-
-  if (WARNINGS.showOnAudioConversion) {
-    let modalHTML = `<div><p>You have existing converted audio files. This action will overwrite them. Save your audio files before proceeding.</p></div>`;
-    showModal({
-      title: "Convert Audio",
-      body: modalHTML,
-      actionFunction: "setWarning('showOnAudioConversion', false)",
-      autoClose: true,
-      actionButtonText: "Saved",
-    });
-  } else {
-    let modalHTml = `<div class="dropdown">
-  <p>Convert your audio to an instrument,<br><br>If you select WebGL, you have to specify the instrument to be converted, also it requires a GPU.<br><br>If you select Google Host, you don't need to specify the instrument, but it can take longer to convert.</p>
-  <ul>
-  <li>WebGL (experimental) </li>
-  <li>Google Host (recommended)</li>
-  </ul>
-  <br>
-  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="conversion-mode-dropdown-btn">
-    Selected : ${selectedConversionMode}</button>
-  <ul class="dropdown-menu" id="conversion-mode-dropdown-menu">
-    <li class="dropdown-item" onclick="selectConversionMode('WebGL')">WebGL</li>
-    <li class="dropdown-item" onclick="selectConversionMode('Google Host')">Google Host</li>
-  </ul>
-</div>`;
-
-    showModal({
-      title: "Select Conversion Mode",
-      body: modalHTml,
-      actionFunction: "convertAudio()",
-      autoClose: true,
-      actionButtonText: "Convert",
-    });
-  }
+  globalAudioConversionManager({
+    type: "main",
+    filename: localStorage.getItem("upload_audio_cache"),
+  });
 });
 
 // ----------------- Set Conversion Mode ----------------- //
@@ -692,3 +682,80 @@ function selectConversionMode(mode) {
 function setWarning(warning, value) {
   WARNINGS[warning] = value;
 }
+
+// ----------------- Convert Audio ----------------- //
+function convertAudio() {
+  if (selectedConversionMode === "WebGL") {
+    console.log("WebGL conversion");
+    showToast({
+      title: "Select an instrument",
+      type: "info",
+      message:
+        "Please select an instrument to which you want to convert your audio",
+      delay: 10000,
+    });
+  } else if (selectedConversionMode === "Google Host") {
+    console.log("Google Host conversion");
+    showToast({
+      title: "Converting your audio",
+      type: "info",
+      message: "This may take a few minutes. Wait until we convert your music!",
+      delay: 10000,
+    });
+  } else {
+    console.log("Invalid conversion mode");
+    showToast({
+      title: "Invalid Conversion Mode",
+      type: "error",
+      message: "Please select a valid conversion mode",
+      delay: 5000,
+    });
+  }
+}
+
+function globalAudioConversionManager(data) {
+  console.log("Global Audio Conversion Manager", data);
+  if (WARNINGS.audioConversionInProgress) {
+    let modalHTML = `<div><p>Audio conversion is in progress. Please wait until the current process is complete.</p></div>`;
+    showModal({
+      title: "Audio Conversion In Progress ⚠️",
+      body: modalHTML,
+      actionFunction: "console.log('Audio conversion in progress')",
+      autoClose: true,
+      actionButtonText: "Okay",
+    });
+  } else if (WARNINGS.audioConversionFileExists) {
+    let modalHTML = `<div><p>You have existing converted audio files. This action will overwrite them. Save your audio files before proceeding.</p></div>`;
+    showModal({
+      title: "Convert Audio",
+      body: modalHTML,
+      actionFunction: "setWarning('audioConversionFileExists', false)",
+      autoClose: true,
+      actionButtonText: "Saved",
+    });
+  } else {
+    let modalHTml = `<div class="dropdown">
+  <p>Convert your audio to an instrument,<br><br>If you select WebGL, you have to specify the instrument to be converted, also it requires a GPU.<br><br>If you select Google Host, you don't need to specify the instrument, but it can take longer to convert.</p>
+  <ul>
+  <li>WebGL (experimental) </li>
+  <li>Google Host (recommended)</li>
+  </ul>
+  <br>
+  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="conversion-mode-dropdown-btn">
+    Selected : ${selectedConversionMode}</button>
+  <ul class="dropdown-menu" id="conversion-mode-dropdown-menu">
+    <li class="dropdown-item" onclick="selectConversionMode('WebGL')">WebGL</li>
+    <li class="dropdown-item" onclick="selectConversionMode('Google Host')">Google Host</li>
+  </ul>
+</div>`;
+
+    showModal({
+      title: "Select Conversion Mode",
+      body: modalHTml,
+      actionFunction: "convertAudio()",
+      autoClose: true,
+      actionButtonText: "Convert",
+    });
+  }
+}
+// where to pass data?
