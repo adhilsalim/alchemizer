@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_file, make_response
 from flask_cors import CORS
 from mutagen.mp3 import MP3
+from dotenv import load_dotenv
 import os
 import subprocess
 import requests
@@ -12,7 +13,7 @@ CORS(app)
 
 # or, to allow only specific origins:
 # cors = CORS(app, resources={r"/*": {"origins": ["http://localhost:3000"]}})
-YOUTUBE_DATA_API_KEY = "AIzaSyAztJsKM1SNJ2xh7Zabm7ElIbnmKB4mlTE"
+YOUTUBE_DATA_API_KEY = os.environ.get('YOUTUBE_DATA_API_KEY')
 YOUTUBE_DATA_ENDPOINT = "https://www.googleapis.com/youtube/v3/search"
 
 # Set the upload folder
@@ -48,7 +49,7 @@ def search_song():
     print('query:', query)
     params = {
         'part': 'snippet',
-        'q': query,
+        'q': query + 'song or music',
         'type': 'video',
         'key': YOUTUBE_DATA_API_KEY
     }

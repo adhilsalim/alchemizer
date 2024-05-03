@@ -63,6 +63,14 @@ const songSearchButton = document.getElementById("song-search-button");
 const songSearchInput = document.getElementById("song-search-input");
 const songSearchContainer = document.getElementById("song-search-container");
 const songSearchQueryText = document.getElementById("song-search-query-text");
+const youtubePlayerCloseButton = document.getElementById("iframe-close-button");
+const youtubeVideoContainer = document.getElementsByClassName(
+  "youtube-mini-player-container"
+)[0];
+
+// ----------------- YouTube Mini Player ----------------- //
+youtubeVideoContainer.style.display = "none";
+
 // ----------------- Welcome Message ----------------- //
 
 welcomeTitle.textContent = `Hello, ${getUserName("first")}`;
@@ -779,6 +787,7 @@ function globalAudioConversionManager(data) {
   }
 }
 
+// ----------------- Song Search Button Event Listener ----------------- //
 songSearchButton.addEventListener("click", () => {
   if (songSearchInput.value === "") {
     showToast({
@@ -804,15 +813,15 @@ songSearchButton.addEventListener("click", () => {
           let songHTML = "";
           data.items.forEach((song) => {
             songHTML = `<article class="search_results__card">
-        <div class="search_results__image">
-            <img src="${song.snippet.thumbnails.medium.url}" alt="${song.snippet.title}"
-                class="search_results__img">
-            <a href="https://www.youtube.com/watch?v=${song.id.videoId}" class="search_results__button button"><span class="material-symbols-outlined">north_east</span></a></div>
-        <div class="search_results__content">
-            <h3 class="search_results__subtitle">${song.snippet.channelTitle}</h3>
-            <h2 class="search_results__title">${song.snippet.title}</h2>
-        </div>
-    </article>`;
+    <div class="search_results__image">
+        <img src="${song.snippet.thumbnails.medium.url}" alt="${song.snippet.title}"
+            class="search_results__img">
+        <a href="#" onclick="openInIframe('${song.id.videoId}'); return false;" class="search_results__button button"><span class="material-symbols-outlined">north_east</span></a></div>
+    <div class="search_results__content">
+        <h3 class="search_results__subtitle">${song.snippet.channelTitle}</h3>
+        <h2 class="search_results__title">${song.snippet.title}</h2>
+    </div>
+</article>`;
 
             const songDocument = new DOMParser().parseFromString(
               songHTML,
@@ -834,4 +843,67 @@ songSearchButton.addEventListener("click", () => {
         });
       });
   }
+});
+
+// ----------------- Open In Iframe ----------------- //
+function openInIframe(videoId) {
+  const iframe = document.getElementById("youtube-video-iframe");
+  iframe.src = `https://www.youtube.com/embed/${videoId}`;
+  youtubeVideoContainer.style.display = "block";
+}
+
+// ----------------- Make Draggable ----------------- //
+function makeDraggable(el) {
+  let pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0;
+
+  const dragMouseDown = (e) => {
+    e.preventDefault();
+    // Get the mouse cursor position at startup:
+    pos3 = e.clientX || e.touches[0].clientX;
+    pos4 = e.clientY || e.touches[0].clientY;
+    document.addEventListener("mouseup", closeDragElement);
+    document.addEventListener("mousemove", elementDrag);
+    // For touch devices:
+    document.addEventListener("touchend", closeDragElement);
+    document.addEventListener("touchmove", elementDrag);
+  };
+
+  const elementDrag = (e) => {
+    e.preventDefault();
+    // Calculate the new cursor position:
+    const clientX = e.clientX || e.touches[0].clientX;
+    const clientY = e.clientY || e.touches[0].clientY;
+    pos1 = pos3 - clientX;
+    pos2 = pos4 - clientY;
+    pos3 = clientX;
+    pos4 = clientY;
+    // Set the element's new position:
+    el.style.top = el.offsetTop - pos2 + "px";
+    el.style.left = el.offsetLeft - pos1 + "px";
+  };
+
+  const closeDragElement = () => {
+    // Stop moving when mouse button is released:
+    document.removeEventListener("mouseup", closeDragElement);
+    document.removeEventListener("mousemove", elementDrag);
+    // For touch devices:
+    document.removeEventListener("touchend", closeDragElement);
+    document.removeEventListener("touchmove", elementDrag);
+  };
+
+  el.addEventListener("mousedown", dragMouseDown);
+  // For touch devices:
+  el.addEventListener("touchstart", dragMouseDown);
+}
+
+let draggableDiv = document.querySelector(".draggable");
+makeDraggable(draggableDiv);
+
+// ----------------- Close Youtube Video ----------------- //
+youtubePlayerCloseButton.addEventListener("click", () => {
+  youtubeVideoContainer.style.display = "none";
+  document.getElementById("youtube-video-iframe").src = "";
 });
