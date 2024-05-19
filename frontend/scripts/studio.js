@@ -30,6 +30,7 @@ const STEM_DICT = {
 };
 
 let selectedStems = "2stems";
+let selectedInstrument = "violin";
 let selectedConversionMode = "WebGL";
 let audioConversionData = null;
 let isLoggedIn = true;
@@ -258,7 +259,7 @@ separateAudioButton.addEventListener("click", () => {
     showModal({
       title: "Separate Audio",
       body: modalHTML,
-      actionFunction: "setWarning('audioSeparationFileExists', false)",
+      actionFunction: "setWarning(`audioSeparationFileExists`, false)",
       autoClose: true,
       actionButtonText: "Saved",
     });
@@ -711,6 +712,26 @@ function convertAudio() {
 
   if (selectedConversionMode === "WebGL") {
     console.log("WebGL conversion");
+
+    let modalHTML = `<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="instrument-dropdown-btn">
+      Selected : ${selectedInstrument}</button>
+    <ul class="dropdown-menu" id="instrument-dropdown-menu">
+      <li class="dropdown-item" onclick="selectInstrument('violin')">Violin</li>
+      <li class="dropdown-item" onclick="selectInstrument('flute')">Flute</li>
+    </ul>
+  </div>`;
+
+    setTimeout(() => {
+      showModal({
+        title: "Select Instrument",
+        body: modalHTML,
+        actionFunction: "convertAudioToInstrument()",
+        autoClose: true,
+        actionButtonText: "Start Conversion",
+      });
+    }, 500);
+
     showToast({
       title: "Select an instrument",
       type: "info",
@@ -735,6 +756,22 @@ function convertAudio() {
       delay: 5000,
     });
   }
+}
+
+// ----------------- Convert Audio To Instrument ----------------- //
+function convertAudioToInstrument() {
+  console.log("Converting audio to instrument:", selectedInstrument);
+  console.log("audioConversionData", audioConversionData);
+}
+
+// ----------------- Select Instrument ----------------- //
+function selectInstrument(instrument) {
+  selectedInstrument = instrument;
+  console.log("Select Instrument:", selectedInstrument);
+
+  document.getElementById(
+    "instrument-dropdown-btn"
+  ).textContent = `Selected : ${selectedInstrument}`;
 }
 
 // ----------------- Global Audio Conversion Manager ----------------- //
