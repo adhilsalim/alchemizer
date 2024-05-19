@@ -5,6 +5,10 @@
 console.clear();
 
 // ----------------- Global Variables -----------------//
+const DDSP_CHECKPOINTS = {
+  violin: "https://storage.googleapis.com/magentadata/js/checkpoints/ddsp/violin",
+  flute: "https://storage.googleapis.com/magentadata/js/checkpoints/ddsp/flute",
+};
 
 const AUDIO_EXAMPLE = {
   example_audio_1: {
@@ -59,6 +63,12 @@ const audioSeparationLoader = document.getElementById(
 );
 const audioSeparationContainer = document.getElementById(
   "audio-separation-container"
+);
+const audioConversionLoader = document.getElementById(
+  "audio-conversion-loader"
+);
+const audioConversionContainer = document.getElementById(
+  "audio-conversion-container"
 );
 const songSearchButton = document.getElementById("song-search-button");
 const songSearchInput = document.getElementById("song-search-input");
@@ -741,6 +751,9 @@ function convertAudio() {
     });
   } else if (selectedConversionMode === "Google Host") {
     console.log("Google Host conversion");
+    
+    convertAudioToInstrument();
+
     showToast({
       title: "Converting your audio",
       type: "info",
@@ -759,9 +772,144 @@ function convertAudio() {
 }
 
 // ----------------- Convert Audio To Instrument ----------------- //
-function convertAudioToInstrument() {
-  console.log("Converting audio to instrument:", selectedInstrument);
-  console.log("audioConversionData", audioConversionData);
+async function convertAudioToInstrument() {
+  if(selectedConversionMode === "WebGL") {
+    if(audioConversionData.type === "main") {
+      const response = await fetch(
+        `${SERVER_IP}/load-audio?filename=${localStorage.getItem("upload_audio_cache")}`
+      );
+
+      if(response.ok) {
+        const blob = await response.blob();
+        const audioBuffer = await loadAudioFromBlob(blob);
+        const checkpoint_url = DDSP_CHECKPOINTS[selectedInstrument];
+        console.log("checkpoint_url", checkpoint_url);
+
+        audioConversionLoader.style.display = "block";
+
+        showToast({
+          title: "Performing tone transfer",
+          type: "info",
+          message: "Converting audio to " + selectedInstrument,
+          delay: 10000,
+        });
+
+        const transferredAudioBuffer = await performToneTransfer(audioBuffer, checkpoint_url);
+        const wavBlob = audioBufferToWavBlob(transferredAudioBuffer);
+        const audioUrl = URL.createObjectURL(wavBlob);
+        audioConversionLoader.style.display = "none";
+
+        const audioPLayerHTML = `<div class="col-12 mt-2 mb-2"><div class="stem-audio-container">
+        <div class="stem-audio-title"> <p>${selectedInstrument}</p> </div> <div class="stem-audio-player">
+        <wave-audio-path-player src="${audioUrl}" wave-width="360" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' title="">
+        </wave-audio-path-player> </div> 
+        <div class="stem-audio-controls" style="display: flex; flex-direction: row; justify-content: end;"> 
+        <a href="${audioUrl}" download="${selectedInstrument}.mp3"><div class="card-control-icon"> <span class="material-symbols-outlined">download</span></div></a>
+        </div></div></div>`;
+
+        const htmlElement = new DOMParser().parseFromString(
+          audioPLayerHTML,
+          "text/html"
+        ).body.firstChild;
+        audioConversionContainer.innerHTML = "";
+        audioConversionContainer.appendChild(htmlElement);
+      }
+    }
+    else if(audioConversionData.type === "stem") {
+      alert("Stem conversion not supported yet");
+    }
+    else{
+      showToast({
+        title: "Invalid Audio Type",
+        type: "error",
+        message: "Please select a valid audio to convert",
+        delay: 5000,
+      });
+      return;
+    }
+  }
+  else if(selectedConversionMode === "Google Host") {
+    selectedInstrument = "None";
+  }
+  else{
+    showToast({
+      title: "Invalid Conversion Mode",
+      type: "error",
+      message: "Please select a valid conversion mode",
+      delay: 5000,
+    });
+    return;
+  }
+}
+
+// Function to fetch and decode an audio Blob
+async function loadAudioFromBlob(blob) {
+  const context = new AudioContext();
+  const arrayBuffer = await blob.arrayBuffer();
+  const audioBuffer = await context.decodeAudioData(arrayBuffer);
+  return audioBuffer;
+}
+
+// Function to convert AudioBuffer to WAV Blob
+function audioBufferToWavBlob(audioBuffer) {
+  function writeString(view, offset, string) {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  }
+
+  function floatTo16BitPCM(output, offset, input) {
+    for (let i = 0; i < input.length; i++, offset += 2) {
+      const s = Math.max(-1, Math.min(1, input[i]));
+      output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    }
+  }
+
+  let channels = 1, sampleRate = audioBuffer.sampleRate;
+  let frameCount = audioBuffer.length;
+  let buffer = new ArrayBuffer(44 + frameCount * 2);
+  let view = new DataView(buffer);
+
+  // RIFF chunk descriptor
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, 36 + frameCount * 2, true);
+  writeString(view, 8, 'WAVE');
+  // FMT sub-chunk
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); // PCM
+  view.setUint16(22, channels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  // data sub-chunk
+  writeString(view, 36, 'data');
+  view.setUint32(40, frameCount * 2, true);
+  floatTo16BitPCM(view, 44, audioBuffer.getChannelData(0));
+
+  return new Blob([buffer], { type: 'audio/wav' });
+}
+
+// Function to perform tone transfer (unchanged)
+async function performToneTransfer(audioBuffer, checkpointUrl) {
+  const spice = new mm.SPICE();
+  await spice.initialize();
+
+  const audioFeatures = await spice.getAudioFeatures(audioBuffer);
+  const ddsp = new mm.DDSP(checkpointUrl);
+  await ddsp.initialize();
+  const synthesizedBuffer = await ddsp.synthesize(audioFeatures);
+
+  const context = new AudioContext();
+  const arrayBufferToAudioBuffer = (audioCtx, arrayBuffer, sampleRate) => {
+    const newBuffer = audioCtx.createBuffer(1, arrayBuffer.length, sampleRate);
+    newBuffer.copyToChannel(arrayBuffer, 0);
+    return newBuffer;
+  };
+  const synthesizedAudioBuffer = arrayBufferToAudioBuffer(context, synthesizedBuffer, 48000);
+
+  return synthesizedAudioBuffer;
 }
 
 // ----------------- Select Instrument ----------------- //
@@ -823,6 +971,7 @@ function globalAudioConversionManager(data) {
     });
   }
 }
+
 
 // ----------------- Song Search Button Event Listener ----------------- //
 songSearchButton.addEventListener("click", () => {
