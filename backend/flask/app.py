@@ -10,27 +10,23 @@ app = Flask(__name__)
 
 # Enable CORS for all routes and origins
 CORS(app)
-
 # or, to allow only specific origins:
 # cors = CORS(app, resources={r"/*": {"origins": ["http://localhost:3000"]}})
+
+# Youtube data api configuration
 YOUTUBE_DATA_API_KEY = os.environ.get('YOUTUBE_DATA_API_KEY')
 YOUTUBE_DATA_ENDPOINT = "https://www.googleapis.com/youtube/v3/search"
 
-# Set the upload folder
+# Folder configuration
 app.config['UPLOAD_FOLDER'] = 'uploads'
-# Set the Spleeter output folder
 app.config['SPLEETER_OUTPUT_FOLDER'] = 'spleeter_output'
 
-# Supported stem configurations
+# Spleeter stem configuration
 STEM_DICT = {"2stems": ["vocals", "accompaniment"], "4stems": ["vocals", "drums", "bass", "other"], "5stems": ["vocals", "drums", "bass", "piano", "other"]}
 
-# Path to the Flask virtual environment
+# Path configuration
 flask_venv_path = r"E:\_ADHIL\___PROJECTS\GITHUB\adhilsalim-alchemizer\backend\flask"
-
-# Path to the Spleeter virtual environment
 spleeter_venv_path = r"E:\_ADHIL\___PROJECTS\GITHUB\adhilsalim-alchemizer\backend\spleeter"
-
-# Path to the Spleeter executable
 spleeter_bin = os.path.join(spleeter_venv_path, "Scripts", "spleeter")
 
 # Create upload folder if it doesn't exist
@@ -39,24 +35,9 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 @app.route('/')
 def index():
-    print('Server is running')
-    return '<h1>Server is running</h1>'
+    print('Namaskaram 🙏')
+    return '<h1>Namskaram 🙏</h1>'
 
-@app.route('/search-song', methods=['POST', 'GET'])
-def search_song():
-    print('searching song...')
-    query = request.args.get('query')
-    print('query:', query)
-    params = {
-        'part': 'snippet',
-        'q': query + 'song or music',
-        'type': 'video',
-        'key': YOUTUBE_DATA_API_KEY
-    }
-
-    response = requests.get(YOUTUBE_DATA_ENDPOINT, params=params)
-    print('sending response...')
-    return response.json()
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -66,17 +47,35 @@ def upload_file():
     Returns:
         A JSON response containing the status of the file upload.
     """
-    print('uploading file...')
+    
     file = request.files['file']
     if file:
         filename = file.filename
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        print('File uploaded:', filename)
+        print('SERVER: file ', filename,' uploaded.')
         return jsonify({'message': 'File uploaded successfully', 'filename': filename})
     else:
-        print('error: no file uploaded')
+        print('SERVER:  file upload failed.')
         return jsonify({'error': 'No file uploaded'})
+
+@app.route('/get-audio-title', methods=['GET'])
+def get_audio_title():
+    filename = request.args.get('filename')
+
+    if filename:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.isfile(file_path):
+            try:
+                audio = MP3(file_path)
+                title = audio['TIT2'].text[0] if 'TIT2' in audio else 'Unknown'
+                return jsonify({'title': title})
+            except Exception as e:
+                print('SERVER: error getting title from the audio', e)
+                return jsonify({'error': str(e)}), 500
+        else:
+            print('SERVER: file missing on server: ', filename)
+            return jsonify({'error': 'File not found'}), 404
 
 @app.route('/load-audio', methods=['GET'])
 def load_audio():
@@ -90,22 +89,20 @@ def load_audio():
     Returns:
         A Flask response object containing the audio file, or an error response if the file is not found or no filename is provided.
     """
-    print('loading audio...')
 
     filename = request.args.get('filename')
     filetype = request.args.get('filetype')
     stemname = request.args.get('stemname')
 
+    print('SERVER: loading audio file:', filename, filetype, stemname)
+
     if filename:
         if filetype == "stem":
             file_path = os.path.join(app.config['SPLEETER_OUTPUT_FOLDER'], filename, stemname + ".wav")
-            print('using stem file path:', file_path)
         else:
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            print('using original file path:', file_path)
 
         if os.path.isfile(file_path):
-            print('File found:', filename)
             try:
                 response = make_response(send_file(file_path, as_attachment=True))
                 response.headers['Content-Type'] = 'audio/mpeg'
@@ -114,32 +111,34 @@ def load_audio():
                 print('Error:', e)
                 return jsonify({'error': str(e)}), 500
         else:
-            print('File not found:', filename)
+            print('SERVER: file missing on server: ', filename)
             return jsonify({'error': 'File not found'}), 404
     else:
-        print('error: no file name provided')
+        print('SERVER: no file name provided')
         return jsonify({'error': 'No file name provided'}), 400
+    
 
-@app.route('/get-audio-title', methods=['GET'])
-def get_audio_title():
-    print('getting audio title...')
-    filename = request.args.get('filename')
+@app.route('/convert-audio', methods=['GET'])
+def convert_audio():
+    """
+    This function converts an instrument stem to a different instrument using Google Tone Transfer.
+    
+    Returns:
+        If the audio conversion is successful, it returns a JSON response with a success message.
+        If there is an error during the audio conversion, it returns a JSON response with the error message."""
+    file_type = request.args.get('filetype')
+    file_name = request.args.get('filename')
 
-    if filename:
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        print('DEBUG - file path:', file_path)
-        if os.path.isfile(file_path):
-            try:
-                audio = MP3(file_path)
-                title = audio['TIT2'].text[0] if 'TIT2' in audio else 'Unknown'
-                print('file title:', title)
-                return jsonify({'title': title})
-            except Exception as e:
-                print('Error:', e)
-                return jsonify({'error': str(e)}), 500
-        else:
-            print('File not found:', filename)
-            return jsonify({'error': 'File not found'}), 404
+    print('file type:', file_type)
+    print('file name:', file_name)
+
+    if file_type == 'stem':
+        pass
+    elif file_type == 'main':
+        pass
+    else:
+        print('error: no file type provided')
+        return jsonify({'error': 'No file type provided'}), 400
 
 @app.route('/separate-audio', methods=['GET'])
 def separate_audio():
@@ -154,7 +153,7 @@ def separate_audio():
         subprocess.CalledProcessError: If there is an error while running the Spleeter command.
 
     """
-    print('separating audio...')
+    print('SERVER: separating audio.')
     filename = request.args.get('filename')
     stems = request.args.get('stems') # example: 2stems, 4stems, 5stems
     print('args:', filename, stems)
@@ -169,15 +168,33 @@ def separate_audio():
 
         try:
             # Run the Spleeter command
-            print('Running command:', command)
+            print('SERVER: Running command:', command)
             subprocess.run(command, check=True, cwd=flask_venv_path, env=os.environ.copy())
             return jsonify({'message': 'Audio separation successful'})
         except subprocess.CalledProcessError as e:
-            print('Error:', e)
+            print('SERVER: Error running Spleeter:', e)
             return jsonify({'error': str(e)}), 500
     else:
-        print('error: no file name provided')
+        print('SERVER: no file name provided')
         return jsonify({'error': 'No file name provided'}), 400
+
+@app.route('/search-song', methods=['POST', 'GET'])
+def search_song():
+    print('SERVER: searching song.')
+    query = request.args.get('query')
+    params = {
+        'part': 'snippet',
+        'q': query + 'song or music',
+        'type': 'video',
+        'key': YOUTUBE_DATA_API_KEY
+    }
+
+    try:
+        response = requests.get(YOUTUBE_DATA_ENDPOINT, params=params)
+        return response.json()
+    except Exception as e:
+        print('SERVER: error searching song:', e)
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     print('Starting server...')
