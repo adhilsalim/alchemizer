@@ -6,7 +6,8 @@ console.clear();
 
 // ----------------- Global Variables -----------------//
 const DDSP_CHECKPOINTS = {
-  violin: "https://storage.googleapis.com/magentadata/js/checkpoints/ddsp/violin",
+  violin:
+    "https://storage.googleapis.com/magentadata/js/checkpoints/ddsp/violin",
   flute: "https://storage.googleapis.com/magentadata/js/checkpoints/ddsp/flute",
 };
 
@@ -458,12 +459,6 @@ function getStems() {
 async function loadSelectedAudio(fileName) {
   if (fileName) {
     try {
-      showToast({
-        title: "Loading Audio",
-        type: "info",
-        message: "Loading " + fileName,
-        delay: 3000,
-      });
       const response = await fetch(
         `${SERVER_IP}/load-audio?filename=${fileName}`
       );
@@ -751,15 +746,8 @@ function convertAudio() {
     });
   } else if (selectedConversionMode === "Google Host") {
     console.log("Google Host conversion");
-    
-    convertAudioToInstrument();
 
-    showToast({
-      title: "Converting your audio",
-      type: "info",
-      message: "This may take a few minutes. Wait until we convert your music!",
-      delay: 10000,
-    });
+    convertAudioToInstrument();
   } else {
     console.log("Invalid conversion mode");
     showToast({
@@ -773,13 +761,15 @@ function convertAudio() {
 
 // ----------------- Convert Audio To Instrument ----------------- //
 async function convertAudioToInstrument() {
-  if(selectedConversionMode === "WebGL") {
-    if(audioConversionData.type === "main") {
+  if (selectedConversionMode === "WebGL") {
+    if (audioConversionData.type === "main") {
       const response = await fetch(
-        `${SERVER_IP}/load-audio?filename=${localStorage.getItem("upload_audio_cache")}`
+        `${SERVER_IP}/load-audio?filename=${localStorage.getItem(
+          "upload_audio_cache"
+        )}`
       );
 
-      if(response.ok) {
+      if (response.ok) {
         const blob = await response.blob();
         const audioBuffer = await loadAudioFromBlob(blob);
         const checkpoint_url = DDSP_CHECKPOINTS[selectedInstrument];
@@ -794,7 +784,10 @@ async function convertAudioToInstrument() {
           delay: 10000,
         });
 
-        const transferredAudioBuffer = await performToneTransfer(audioBuffer, checkpoint_url);
+        const transferredAudioBuffer = await performToneTransfer(
+          audioBuffer,
+          checkpoint_url
+        );
         const wavBlob = audioBufferToWavBlob(transferredAudioBuffer);
         const audioUrl = URL.createObjectURL(wavBlob);
         audioConversionLoader.style.display = "none";
@@ -813,12 +806,23 @@ async function convertAudioToInstrument() {
         ).body.firstChild;
         audioConversionContainer.innerHTML = "";
         audioConversionContainer.appendChild(htmlElement);
+
+        showToast({
+          title: "Audio Converted 🎉",
+          type: "success",
+          message: "Audio converted successfully",
+          delay: 10000,
+        });
       }
-    }
-    else if(audioConversionData.type === "stem") {
-      alert("Stem conversion not supported yet");
-    }
-    else{
+    } else if (audioConversionData.type === "stem") {
+      showToast({
+        title: "Conversion Error",
+        type: "error",
+        message:
+          "We are expanding our services to convert stems using WebGL. Please use Google Host for now.",
+        delay: 5000,
+      });
+    } else {
       showToast({
         title: "Invalid Audio Type",
         type: "error",
@@ -827,21 +831,82 @@ async function convertAudioToInstrument() {
       });
       return;
     }
-  }
-  else if(selectedConversionMode === "Google Host") {
-    selectedInstrument = "None";
-  }
-  else{
+  } else if (selectedConversionMode === "Google Host") {
     showToast({
-      title: "Invalid Conversion Mode",
-      type: "error",
-      message: "Please select a valid conversion mode",
-      delay: 5000,
+      title: "Converting your audio",
+      type: "info",
+      message: "This may take a few minutes. Wait until we convert your music!",
+      delay: 10000,
     });
-    return;
+
+    if (audioConversionData.type === "main") {
+      const response = await fetch(
+        `${SERVER_IP}/convert-audio?filename=${localStorage.getItem(
+          "upload_audio_cache"
+        )}&filetype=main`
+      );
+
+      if (response.ok) {
+        console.log("Audio converted successfully");
+        // showToast({
+        //   title: "Audio Converted 🎉",
+        //   type: "success",
+        //   message:
+        //     "Audio converted successfully. You can find the converted audio in the audio conversion section.",
+        //   delay: 10000,
+        // });
+        if(getAudioFromFlask({
+          type: "convert",
+          convert: {
+            directory: audioConversionData.filename,
+          },
+          onlyHTML: true,
+          HTMLcontainer: audioConversionContainer,
+        })){
+          showToast({
+            title: "Audio Converted 🎉",
+            type: "success",
+            message:
+              "Audio converted successfully. You can find the converted audio in the audio conversion section.",
+            delay: 10000,
+          });
+        }
+      } else {
+        showToast({
+          title: "Something went wrong",
+          type: "error",
+          message: "Please try again later",
+          delay: 5000,
+        });
+        return;
+      }
+    } else if (audioConversionData.type === "stem") {
+      const response = await fetch(
+        `${SERVER_IP}/convert-audio?filename=${audioConversionData.filename}&filetype=stem`
+      );
+
+      if (response.ok) {
+        console.log("Audio converted successfully");
+      } else {
+        showToast({
+          title: "Something went wrong",
+          type: "error",
+          message: "Please try again later",
+          delay: 5000,
+        });
+        return;
+      }
+    } else {
+      showToast({
+        title: "Invalid Conversion Mode",
+        type: "error",
+        message: "Please select a valid conversion mode",
+        delay: 5000,
+      });
+      return;
+    }
   }
 }
-
 // Function to fetch and decode an audio Blob
 async function loadAudioFromBlob(blob) {
   const context = new AudioContext();
@@ -861,21 +926,22 @@ function audioBufferToWavBlob(audioBuffer) {
   function floatTo16BitPCM(output, offset, input) {
     for (let i = 0; i < input.length; i++, offset += 2) {
       const s = Math.max(-1, Math.min(1, input[i]));
-      output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
     }
   }
 
-  let channels = 1, sampleRate = audioBuffer.sampleRate;
+  let channels = 1,
+    sampleRate = audioBuffer.sampleRate;
   let frameCount = audioBuffer.length;
   let buffer = new ArrayBuffer(44 + frameCount * 2);
   let view = new DataView(buffer);
 
   // RIFF chunk descriptor
-  writeString(view, 0, 'RIFF');
+  writeString(view, 0, "RIFF");
   view.setUint32(4, 36 + frameCount * 2, true);
-  writeString(view, 8, 'WAVE');
+  writeString(view, 8, "WAVE");
   // FMT sub-chunk
-  writeString(view, 12, 'fmt ');
+  writeString(view, 12, "fmt ");
   view.setUint32(16, 16, true);
   view.setUint16(20, 1, true); // PCM
   view.setUint16(22, channels, true);
@@ -884,30 +950,52 @@ function audioBufferToWavBlob(audioBuffer) {
   view.setUint16(32, 2, true);
   view.setUint16(34, 16, true);
   // data sub-chunk
-  writeString(view, 36, 'data');
+  writeString(view, 36, "data");
   view.setUint32(40, frameCount * 2, true);
   floatTo16BitPCM(view, 44, audioBuffer.getChannelData(0));
 
-  return new Blob([buffer], { type: 'audio/wav' });
+  return new Blob([buffer], { type: "audio/wav" });
 }
 
 // Function to perform tone transfer (unchanged)
 async function performToneTransfer(audioBuffer, checkpointUrl) {
-  const spice = new mm.SPICE();
-  await spice.initialize();
+  let synthesizedAudioBuffer = null;
 
-  const audioFeatures = await spice.getAudioFeatures(audioBuffer);
-  const ddsp = new mm.DDSP(checkpointUrl);
-  await ddsp.initialize();
-  const synthesizedBuffer = await ddsp.synthesize(audioFeatures);
+  try {
+    const spice = new mm.SPICE();
+    await spice.initialize();
 
-  const context = new AudioContext();
-  const arrayBufferToAudioBuffer = (audioCtx, arrayBuffer, sampleRate) => {
-    const newBuffer = audioCtx.createBuffer(1, arrayBuffer.length, sampleRate);
-    newBuffer.copyToChannel(arrayBuffer, 0);
-    return newBuffer;
-  };
-  const synthesizedAudioBuffer = arrayBufferToAudioBuffer(context, synthesizedBuffer, 48000);
+    const audioFeatures = await spice.getAudioFeatures(audioBuffer);
+    const ddsp = new mm.DDSP(checkpointUrl);
+    await ddsp.initialize();
+    const synthesizedBuffer = await ddsp.synthesize(audioFeatures);
+
+    const context = new AudioContext();
+    const arrayBufferToAudioBuffer = (audioCtx, arrayBuffer, sampleRate) => {
+      const newBuffer = audioCtx.createBuffer(
+        1,
+        arrayBuffer.length,
+        sampleRate
+      );
+      newBuffer.copyToChannel(arrayBuffer, 0);
+      return newBuffer;
+    };
+    synthesizedAudioBuffer = arrayBufferToAudioBuffer(
+      context,
+      synthesizedBuffer,
+      48000
+    );
+  } catch (error) {
+    console.error("Error performing tone transfer:", error);
+    showToast({
+      title: "Error Performing Tone Transfer",
+      type: "error",
+      message:
+        "This could be due to insufficient GPU memory. Avoid running other GPU-intensive tasks simultaneously.",
+      delay: 5000,
+    });
+    return null;
+  }
 
   return synthesizedAudioBuffer;
 }
@@ -971,7 +1059,6 @@ function globalAudioConversionManager(data) {
     });
   }
 }
-
 
 // ----------------- Song Search Button Event Listener ----------------- //
 songSearchButton.addEventListener("click", () => {
@@ -1093,3 +1180,114 @@ youtubePlayerCloseButton.addEventListener("click", () => {
   youtubeVideoContainer.style.display = "none";
   document.getElementById("youtube-video-iframe").src = "";
 });
+
+// ----------------- Get Audio From Flask ----------------- //
+function getAudioFromFlask(audioData) {
+  // check if onlyBlobURL and onlyHTML are both true
+  if (audioData.onlyBlobURL && audioData.onlyHTML) {
+    console.error(
+      "getAudioFromFlask",
+      "both onlyBlobURL and onlyHTML cannot be true"
+    );
+    showToast({
+      title: "Invalid Audio Data Configuration",
+      type: "error",
+      message:
+        "Cannot get audio from Flask. Both onlyBlobURL and onlyHTML cannot be true at the same time.",
+      delay: 5000,
+    });
+  }
+
+  // check if onlyHTML is true and HTML container is not provided
+  if (audioData.onlyHTML && !audioData.HTMLcontainer) {
+    console.error("getAudioFromFlask", "HTML container not provided");
+    showToast({
+      title: "HTML Container Not Provided",
+      type: "error",
+      message: "HTML container should be provided if onlyHTML is true.",
+      delay: 5000,
+    });
+  }
+
+  // check the type of audio data
+  if (audioData.type === "main") {
+    // TODO
+  } else if (audioData.type === "stem") {
+    // TODO
+  } else if (audioData.type === "convert") {
+    if (!audioData.convert.directory) {
+      console.error("getAudioFromFlask", "Convert directory not provided");
+      showToast({
+        title: "Convert Directory Not Provided",
+        type: "error",
+        message: "Cannot get audio from Flask. Convert directory not provided.",
+        delay: 5000,
+      });
+    }
+
+    const instrument_list = ["Violin", "Flute", "Trumpet", "Saxophone"];
+    let audioUrls = [];
+
+    // if onlyHTML is true, clear container
+    if (audioData.onlyHTML) {
+      audioData.HTMLcontainer.innerHTML = "";
+    }
+
+instrument_list.forEach(async (instrument) => {
+  const response = await fetch(
+    `${SERVER_IP}/convert-audio?directory=${audioData.convert.directory}&filetype=convert&instrument=${instrument}`
+  );
+
+  if (response.ok) {
+    const blob = await response.blob();
+    const audioUrl = URL.createObjectURL(blob);
+
+    // add blob URL to audioUrls if onlyBlobURL is true
+    if (audioData.onlyBlobURL) {
+      audioUrls.push(audioUrl);
+    }
+
+    // create HTML component if onlyHTML is true
+    if (audioData.onlyHTML) {
+      const audioPLayerHTML = `<div class="col-12 mt-2 mb-2"><div class="stem-audio-container">
+      <div class="stem-audio-title"> <p>${instrument}</p> </div> <div class="stem-audio-player">
+      <wave-audio-path-player src="${audioUrl}" wave-width="360" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' title="">
+      </wave-audio-path-player> </div> 
+      <div class="stem-audio-controls" style="display: flex; flex-direction: row; justify-content: end;"> 
+      <a href="${audioUrl}" download="${instrument}.mp3"><div class="card-control-icon"> <span class="material-symbols-outlined">download</span></div></a>
+      </div></div></div>`;
+
+      const htmlElement = new DOMParser().parseFromString(
+        audioPLayerHTML,
+        "text/html"
+      ).body.firstChild;
+
+      audioData.HTMLcontainer.appendChild(htmlElement);
+    }
+  } else {
+    console.error("getAudioFromFlask", "Error getting converted audio");
+    showToast({
+      title: "Error getting converted audio",
+      type: "error",
+      message:
+        "Either the file does not exist or the directory is invalid.",
+      delay: 5000,
+    });
+  }
+});
+
+    if (audioData.onlyBlobURL) {
+      return audioUrls;
+    } else {
+      return true;
+    }
+  } else {
+    console.error("getAudioFromFlask", "Invalid audio data type");
+    showToast({
+      title: "Invalid Audio Data Type",
+      type: "error",
+      message: "Cannot get audio from Flask. Invalid audio data type.",
+      delay: 5000,
+    });
+  }
+}
