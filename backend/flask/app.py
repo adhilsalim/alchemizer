@@ -110,7 +110,7 @@ def load_audio():
 
     print('SERVER: loading audio file:', filename, filetype, stemname)
 
-    if filename:
+    if filename or filetype == "convert":
         if filetype == "convert":
             # check whether directory and instrument are provided
             if not directory or not instrument:

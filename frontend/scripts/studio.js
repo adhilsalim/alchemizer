@@ -858,7 +858,7 @@ async function convertAudioToInstrument() {
         if(getAudioFromFlask({
           type: "convert",
           convert: {
-            directory: audioConversionData.filename,
+            directory: audioConversionData.filename.replace(".mp3", "").replace(".wav", ""),
           },
           onlyHTML: true,
           HTMLcontainer: audioConversionContainer,
@@ -875,7 +875,7 @@ async function convertAudioToInstrument() {
         showToast({
           title: "Something went wrong",
           type: "error",
-          message: "Please try again later",
+          message: "We faced an unintended error. Please try again later",
           delay: 5000,
         });
         return;
@@ -1235,7 +1235,7 @@ function getAudioFromFlask(audioData) {
 
 instrument_list.forEach(async (instrument) => {
   const response = await fetch(
-    `${SERVER_IP}/convert-audio?directory=${audioData.convert.directory}&filetype=convert&instrument=${instrument}`
+    `${SERVER_IP}/load-audio?directory=${audioData.convert.directory}&filetype=convert&instrument=${instrument}`
   );
 
   if (response.ok) {
