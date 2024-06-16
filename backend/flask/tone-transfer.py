@@ -14,6 +14,8 @@ import bs4
 import warnings
 from pprint import pprint
 from aiohttp import web
+import os
+import base64
 
 
 # check the length of args, if < 3, print usage and exit
@@ -172,16 +174,18 @@ async def main():
             print('TimeoutError: recorder__progress not hidden')
 
         # click MuiButtonBase-root player__controls__download
-        await page.evaluate('document.querySelector(".MuiButtonBase-root.player__controls__download").click()')
-
+        try:
+            await page.evaluate('document.querySelector(".MuiButtonBase-root.player__controls__download").click()')
+        except Exception as e:
+            error_message = 'device-compatibility-error'
+            print(error_message)
+            sys.exit(1)
         # get html of MuiDialogContent-root dialog__content--no-actions
         # and print it
 
         dialog_content = await page.evaluate('document.querySelector(".MuiDialogContent-root.dialog__content--no-actions").innerHTML')
         for i in bs4.BeautifulSoup(dialog_content, 'html.parser').find_all('a', class_="download-btn", href=True):
-            print(i['href'])
             if "blob:" in i['href']:
-                print('blob url found', i['href'])
                 transformations.append({
                     "url": i['href'],
                     "name": i.get('download', 'unknown-transform')
@@ -189,23 +193,24 @@ async def main():
     except Exception as e:
         print('Error:', e)
     
+    print(' checking whether download folder exists')
+    # create download folder if not exists
+    if not os.path.exists(sys.argv[2]):
+        os.makedirs(sys.argv[2])
+
+    print('downloading files')
     
-            
     await page._client.send('Page.setDownloadBehavior', {'behavior': 'allow', 'downloadPath': sys.argv[2]})
-    
 
     # now download the transformed audio files from the urls in transformations
     # use proxy server to download the files from blob memory
     for i in transformations:
-        await page.goto("http://localhost:5500?url="+i['url'])
-        # wait till button with id, textContent != ''
+        await page.goto("http://localhost:5500?url=" + i['url'])
         await page.waitForFunction('document.getElementById("1").textContent != ""')
-        # get base64 data
         base64data = await page.evaluate('document.getElementById("1").textContent')
-        # write to file
-        with open(i['name'], 'wb') as f:
-            import base64
+        with open(os.path.join(sys.argv[2], i['name']), 'wb') as f:
             f.write(base64.b64decode(base64data.split(',')[1]))
+
 
     pprint(transformations)
     await browser.close()
