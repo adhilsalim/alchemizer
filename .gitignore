@@ -10,6 +10,7 @@ backend/flask/Scripts/
 backend/flask/uploads/
 backend/flask/share/
 backend/flask/spleeter_output/
+backend/flask/converted_audio/
 backend/spleeter/Include/
 backend/spleeter/Lib/
 backend/spleeter/Scripts/

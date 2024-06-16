@@ -19,6 +19,7 @@ YOUTUBE_DATA_ENDPOINT = "https://www.googleapis.com/youtube/v3/search"
 
 # Folder configuration
 app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['CONVERT_FOLDER'] = 'converted_audio'
 app.config['SPLEETER_OUTPUT_FOLDER'] = 'spleeter_output'
 
 # Spleeter stem configuration
@@ -42,7 +43,7 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     """
-    Uploads a file to the server.
+    Uploads audio file to the server.
 
     Returns:
         A JSON response containing the status of the file upload.
@@ -61,6 +62,17 @@ def upload_file():
 
 @app.route('/get-audio-title', methods=['GET'])
 def get_audio_title():
+    """
+    Retrieves the title of an audio file.
+
+    This function retrieves the filename from the request arguments and attempts to locate the file in the upload folder.
+    If the file is found, it reads the audio metadata and returns the title of the audio file.
+    If the file is not found or if no filename is provided, appropriate error responses are returned.
+
+    Returns:
+        A JSON response containing the title of the audio file, or an error response if the file is not found or no filename is provided.
+    """
+
     filename = request.args.get('filename')
 
     if filename:
@@ -80,7 +92,7 @@ def get_audio_title():
 @app.route('/load-audio', methods=['GET'])
 def load_audio():
     """
-    Load and serve an audio file.
+    Serves an audio file.
 
     This function retrieves the filename from the request arguments and attempts to locate the file in the upload folder.
     If the file is found, it reads the audio metadata, sets the appropriate response headers, and returns the audio file as a response.
@@ -108,7 +120,7 @@ def load_audio():
                 response.headers['Content-Type'] = 'audio/mpeg'
                 return response
             except Exception as e:
-                print('Error:', e)
+                print('SERVER: error loading audio file:', e)
                 return jsonify({'error': str(e)}), 500
         else:
             print('SERVER: file missing on server: ', filename)
@@ -125,21 +137,51 @@ def convert_audio():
     
     Returns:
         If the audio conversion is successful, it returns a JSON response with a success message.
-        If there is an error during the audio conversion, it returns a JSON response with the error message."""
+        If there is an error during the audio conversion, it returns a JSON response with the error message.
+    """
     file_type = request.args.get('filetype')
     file_name = request.args.get('filename')
 
-    print('file type:', file_type)
-    print('file name:', file_name)
+    print('SERVER:',file_name, file_type)
 
-    if file_type == 'stem':
-        pass
-    elif file_type == 'main':
-        pass
+    if file_type == 'main':
+        input_path = os.path.join(app.config['UPLOAD_FOLDER'], file_name)
+    elif file_type == 'stem':
+        input_path = os.path.join(app.config['SPLEETER_OUTPUT_FOLDER'], file_name + '.wav')
     else:
-        print('error: no file type provided')
-        return jsonify({'error': 'No file type provided'}), 400
+        print('SERVER: invalid file type')
+        return jsonify({'error': 'Invalid file type'}), 400
 
+    output_path = os.path.join(app.config['CONVERT_FOLDER'], file_name.replace('.mp3', ''))
+
+    # print path
+    print('SERVER:', input_path, output_path)
+
+    # Convert to absolute paths
+    input_path = os.path.abspath(input_path)
+    output_path = os.path.abspath(output_path)
+
+    # Determine the path to the Python interpreter in the virtual environment
+    venv_python = os.path.join(flask_venv_path, 'Scripts', 'python.exe')
+
+    # Run the tone-transfer.py script with the provided arguments
+    try:
+        result = subprocess.run(
+            [venv_python, 'tone-transfer.py', input_path, output_path],
+            capture_output=True, text=True, check=True
+        )
+
+        # Check for specific error message
+        output_message = result.stdout.strip()
+        if 'device-compatibility-error' in output_message:
+            return jsonify({'error': 'Audio conversion failed due to device compatibility issues'}), 500
+        
+        return jsonify({'message': 'Audio conversion successful'}), 200
+    except subprocess.CalledProcessError as e:
+        print('SERVER: Error running tone-transfer.py:', e)
+        return jsonify({'error': 'Audio conversion failed', 'details': e.stderr}), 500
+
+    
 @app.route('/separate-audio', methods=['GET'])
 def separate_audio():
     """
@@ -151,23 +193,19 @@ def separate_audio():
 
     Raises:
         subprocess.CalledProcessError: If there is an error while running the Spleeter command.
-
     """
     print('SERVER: separating audio.')
     filename = request.args.get('filename')
-    stems = request.args.get('stems') # example: 2stems, 4stems, 5stems
-    print('args:', filename, stems)
+    stems = request.args.get('stems')
     if filename:
         file_path = os.path.join('uploads', filename)
         output_dir = 'spleeter_output'
-        
-        # check whether the separated audio files already exist
 
-        # Construct the Spleeter command
+        # [TO-DO] check whether the separated audio files already exist
+
         command = [spleeter_bin, "separate", "-p", "spleeter:" + stems, "-o", output_dir, file_path]
 
         try:
-            # Run the Spleeter command
             print('SERVER: Running command:', command)
             subprocess.run(command, check=True, cwd=flask_venv_path, env=os.environ.copy())
             return jsonify({'message': 'Audio separation successful'})
@@ -197,5 +235,4 @@ def search_song():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    print('Starting server...')
     app.run(debug=True)
