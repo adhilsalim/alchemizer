@@ -103,13 +103,25 @@ def load_audio():
     """
 
     filename = request.args.get('filename')
+    directory = request.args.get('directory')
+    instrument = request.args.get('instrument')
     filetype = request.args.get('filetype')
     stemname = request.args.get('stemname')
 
     print('SERVER: loading audio file:', filename, filetype, stemname)
 
     if filename:
-        if filetype == "stem":
+        if filetype == "convert":
+            # check whether directory and instrument are provided
+            if not directory or not instrument:
+                print('SERVER: directory and instrument not provided')
+                return jsonify({'error': 'Directory and instrument not provided'}), 400
+            else:
+                # check whether instrument name is Saxophone if true, change it to Tenor Saxophone
+                if instrument == 'Saxophone':
+                    instrument = 'Tenor Saxophone'
+                file_path = os.path.join(app.config['CONVERT_FOLDER'], directory, 'Tone Transfer - ' + instrument + '.wav')
+        elif filetype == "stem":
             file_path = os.path.join(app.config['SPLEETER_OUTPUT_FOLDER'], filename, stemname + ".wav")
         else:
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
