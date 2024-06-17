@@ -224,10 +224,16 @@ uploadAudioButton.addEventListener("click", () => {
  * The cached file name can be used to pre-populate the file selection input if the user leaves
  * the page and comes back later.
  */
-function cacheFile(file) {
+function cacheFile(file, isRecording = false) {
   if (file) {
-    localStorage.setItem("upload_audio_cache", file.name);
-    console.log("File name cached:", file.name);
+    if(!isRecording) {
+      localStorage.setItem("upload_audio_cache", file.name);
+      console.log("File name cached:", file.name);
+    }
+    else{
+      localStorage.setItem("upload_audio_cache", 'recorded_audio.wav'); // 'recorded_audio.wav' is the default name for the recorded audio file
+      console.log("File name cached:", 'recorded_audio.wav');
+    }
   } else {
     console.log("CRASH: No file selected.");
     showToast({
@@ -300,15 +306,103 @@ const showToast = (data) => {
 
 
 // ----------------- New Project ----------------- //
-
 document.addEventListener('DOMContentLoaded', function() {
   const queryParams = new URLSearchParams(window.location.search);
 
   if (queryParams.get('new-project') === 'true') {
       const button = document.getElementById('main-function-button');
-      
+
       if (button) {
           button.click();
       }
   }
 });
+
+
+// ----------------- Audio Recording ----------------- //
+let isRecording = false;
+let mediaRecorder;
+let audioChunks = [];
+let recordAudioUrl = null;
+const recordAudioButton = document.getElementById("record-audio");
+const recordAudioButtonText = document.getElementById("record-audio-text");
+
+// Function to record audio
+const recordAudio = () =>
+  new Promise(async (resolve) => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream);
+    const audioChunks = [];
+    mediaRecorder.addEventListener("dataavailable", (event) => {
+      audioChunks.push(event.data);
+    });
+
+    const start = () => mediaRecorder.start();
+
+    const stop = () =>
+      new Promise((resolve) => {
+        mediaRecorder.addEventListener("stop", () => {
+          const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+          recordAudioUrl = URL.createObjectURL(audioBlob);
+          file = new File([audioBlob], "recorded_audio.wav", {
+            type: "audio/wav",
+            lastModified: Date.now()
+          });
+          console.log('file', file)
+          resolve({ audioBlob, recordAudioUrl});
+        });
+        mediaRecorder.stop();
+      });
+
+    resolve({ start, stop });
+  });
+
+const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
+
+
+const startRecording = async () => {
+  const recording = await recordAudio();
+  recording.start();
+
+  showToast({
+    title: "Recording starting soon...",
+    type: "info",
+    message: "Recording starts now. Click 'Stop Recording' to finish.",
+    delay: 5000,
+  });
+
+  while (isRecording == true) {
+    await sleep(1);
+  }
+
+  const audio = await recording.stop();
+
+  // Show toast notification for recording stop
+  showToast({
+    title: "Recording Stopped",
+    type: "info",
+    message: "Recording has stopped. You can listen to the recording now.",
+    delay: 5000,
+  });
+  cacheFile(file, true);
+  const recordAudioContainer = document.getElementById("record-audio-container");
+  recordAudioContainer.innerHTML = `<wave-audio-path-player src="${recordAudioUrl}" wave-width="400" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' id="main-audio-player" title=""></wave-audio-path-player>`;
+};
+
+recordAudioButton.addEventListener("click", (e) => {
+  if (isRecording) {
+      isRecording = false;
+      recordAudioButtonText.textContent = "Start Recording";
+      recordAudioButton.classList.remove("light-red-bgcolor");
+      recordAudioButton.classList.add("light-green-bgcolor");
+
+  } else{
+    isRecording = true;
+    recordAudioButtonText.textContent = "Stop Recording";
+    recordAudioButton.classList.remove("light-green-bgcolor");
+    recordAudioButton.classList.add("light-red-bgcolor");
+    startRecording();
+  }
+});
+
+console.log(isRecording);

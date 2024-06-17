@@ -11,6 +11,10 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="styles/main.css">
     <link rel="icon" type="image/x-icon" href="./assets/images/icons/favicon.ico">
+    <script
+    type="module"
+    src="../assets/scripts/wave-audio-path-player/wave-audio-path-player.umd.js"
+  ></script>
     <script defer src="scripts/main.js"></script>
 </head>
 
@@ -168,12 +172,8 @@
                                 <br>
                                 <h5>OR</h5>
                                 <br>
-                                <div class="modal-button" onclick="showToast({
-                                    title: 'Feature Coming Soon 🚀',
-                                    message: 'This feature is under development and will be available soon.',
-                                    type: 'info'
-                                })">
-                                    <div class="modal-button-text">Record Audio</div>
+                                <div class="modal-button" id="record-audio">
+                                    <div class="modal-button-text" id="record-audio-text">Record Audio</div>
                                     <div class="modal-button-icon">
                                         <span class="material-symbols-outlined">
                                             mic
@@ -192,6 +192,11 @@
                                         </span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12" id="record-audio-container">
+                                <h1>test</h1>
                             </div>
                         </div>
                     </div>
