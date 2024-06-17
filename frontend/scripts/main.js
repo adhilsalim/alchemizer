@@ -297,3 +297,18 @@ const showToast = (data) => {
 
   toast.show();
 };
+
+
+// ----------------- New Project ----------------- //
+
+document.addEventListener('DOMContentLoaded', function() {
+  const queryParams = new URLSearchParams(window.location.search);
+
+  if (queryParams.get('new-project') === 'true') {
+      const button = document.getElementById('main-function-button');
+      
+      if (button) {
+          button.click();
+      }
+  }
+});
