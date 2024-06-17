@@ -1,7 +1,10 @@
 // import { showToast, showModal } from "./utils.js";
+/*
 
+SORRY for the code quality! Gotta do a lot of refactoring and clean up.
+
+*/
 // ----------------- Clear Console ----------------- //
-
 console.clear();
 
 // ----------------- Global Variables -----------------//
@@ -815,13 +818,61 @@ async function convertAudioToInstrument() {
         });
       }
     } else if (audioConversionData.type === "stem") {
-      showToast({
-        title: "Conversion Error",
-        type: "error",
-        message:
-          "We are expanding our services to convert stems using WebGL. Please use Google Host for now.",
-        delay: 5000,
-      });
+      (async () => {
+        const blob = await getAudioFromFlask({
+          type: "stem",
+          stem: {
+            directory: 'default',
+            getOnly: audioConversionData.filename.split("/")[1],
+          },
+          onlyBlob: true,
+        });
+      
+        console.log("blob", blob);
+
+        const audioBuffer = await loadAudioFromBlob(blob);
+        const checkpoint_url = DDSP_CHECKPOINTS[selectedInstrument];
+        console.log("checkpoint_url", checkpoint_url);
+
+        audioConversionLoader.style.display = "block";
+
+        showToast({
+          title: "Performing tone transfer",
+          type: "info",
+          message: "Converting audio to " + selectedInstrument,
+          delay: 10000,
+        });
+
+        const transferredAudioBuffer = await performToneTransfer(
+          audioBuffer,
+          checkpoint_url
+        );
+        const wavBlob = audioBufferToWavBlob(transferredAudioBuffer);
+        const audioUrl = URL.createObjectURL(wavBlob);
+        audioConversionLoader.style.display = "none";
+
+        const audioPLayerHTML = `<div class="col-12 mt-2 mb-2"><div class="stem-audio-container">
+        <div class="stem-audio-title"> <p>${selectedInstrument}</p> </div> <div class="stem-audio-player">
+        <wave-audio-path-player src="${audioUrl}" wave-width="360" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' title="">
+        </wave-audio-path-player> </div> 
+        <div class="stem-audio-controls" style="display: flex; flex-direction: row; justify-content: end;"> 
+        <a href="${audioUrl}" download="${selectedInstrument}.mp3"><div class="card-control-icon"> <span class="material-symbols-outlined">download</span></div></a>
+        </div></div></div>`;
+
+        const htmlElement = new DOMParser().parseFromString(
+          audioPLayerHTML,
+          "text/html"
+        ).body.firstChild;
+        audioConversionContainer.innerHTML = "";
+        audioConversionContainer.appendChild(htmlElement);
+
+        showToast({
+          title: "Audio Converted 🎉",
+          type: "success",
+          message: "Audio converted successfully",
+          delay: 10000,
+        });
+      })();
     } else {
       showToast({
         title: "Invalid Audio Type",
@@ -1200,23 +1251,24 @@ youtubePlayerCloseButton.addEventListener("click", () => {
 });
 
 // ----------------- Get Audio From Flask ----------------- //
-function getAudioFromFlask(audioData) {
+async function getAudioFromFlask(audioData) {
   // ensure only one of onlyBlobURL, onlyBlob, and onlyHTML is true
-  if (audioData.onlyBlobURL + audioData.onlyBlob + audioData.onlyHTML !== 1) {
-    console.error(
-      "getAudioFromFlask",
-      "Only one of onlyBlobURL, onlyBlob, and onlyHTML can be true"
-    );
-    showToast({
-      title: "Invalid Audio Data Configuration",
-      type: "error",
-      message:
-        "Cannot get audio from Flask. Only one of onlyBlobURL, onlyBlob, and onlyHTML can be true at the same time.",
-      delay: 5000,
-    });
+  // FIX THIS
+  // if ((audioData.onlyBlobURL + audioData.onlyBlob + audioData.onlyHTML) !== 1) {
+  //   console.error(
+  //     "getAudioFromFlask",
+  //     "Only one of onlyBlobURL, onlyBlob, and onlyHTML can be true"
+  //   );
+  //   showToast({
+  //     title: "Invalid Audio Data Configuration",
+  //     type: "error",
+  //     message:
+  //       "Cannot get audio from Flask. Only one of onlyBlobURL, onlyBlob, and onlyHTML can be true at the same time.",
+  //     delay: 5000,
+  //   });
 
-    return false;
-  }
+  //   return false;
+  // }
 
   // check if onlyHTML is true and HTML container is not provided
   if (audioData.onlyHTML && !audioData.HTMLcontainer) {
@@ -1249,28 +1301,43 @@ function getAudioFromFlask(audioData) {
     }
 
     if (audioData.stem.getOnly) {
-    fetch(`${SERVER_IP}/load-audio?filename=${localStorage.getItem("upload_audio_cache").replace(".mp3", "").replace(".wav", "")}&filetype=stem&stemname=${audioData.stem.getOnly}`)
-      .then(response => {
-        const blob = response.blob();
+      console.log("getAudioFromFlask", "Getting only stem");
+      try {
+        const response = await fetch(
+          `${SERVER_IP}/load-audio?filename=${localStorage
+            .getItem("upload_audio_cache")
+            .replace(".mp3", "")
+            .replace(".wav", "")}&filetype=stem&stemname=${
+            audioData.stem.getOnly
+          }`
+        );
+        const blob = await response.blob();
 
-        if(audioData.onlyBlob){
+        if (audioData.onlyBlob) {
+          console.log("getAudioFromFlask", "Returning blob");
+          console.log("blob from function", blob);
           return blob;
         }
 
         const audioUrl = URL.createObjectURL(blob);
 
-        if(audioData.onlyBlobURL){
+        if (audioData.onlyBlobURL) {
           return audioUrl;
         }
 
-        if(audioData.onlyHTML){
-          // TODO, Return false for now
+        if (audioData.onlyHTML) {
           return false;
         }
-      })
-      .catch(error => {
+      } catch (error) {
         console.error("Error fetching audio:", error);
-      });
+        showToast({
+          title: "Error Fetching Audio",
+          type: "error",
+          message: "Internal server error. Please try again later.",
+          delay: 5000,
+        });
+        return false;
+      }
     } else if (audioData.stem.getAll) {
       // TODO, return false for now
       return false;
@@ -1287,8 +1354,7 @@ function getAudioFromFlask(audioData) {
       return false;
     }
   } else if (audioData.type === "convert") {
-
-    if(audioData.onlyBlob){
+    if (audioData.onlyBlob) {
       // TODO, return false for now
       return false;
     }
