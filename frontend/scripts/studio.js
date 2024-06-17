@@ -848,21 +848,18 @@ async function convertAudioToInstrument() {
 
       if (response.ok) {
         console.log("Audio converted successfully");
-        // showToast({
-        //   title: "Audio Converted 🎉",
-        //   type: "success",
-        //   message:
-        //     "Audio converted successfully. You can find the converted audio in the audio conversion section.",
-        //   delay: 10000,
-        // });
-        if(getAudioFromFlask({
-          type: "convert",
-          convert: {
-            directory: audioConversionData.filename.replace(".mp3", "").replace(".wav", ""),
-          },
-          onlyHTML: true,
-          HTMLcontainer: audioConversionContainer,
-        })){
+        if (
+          getAudioFromFlask({
+            type: "convert",
+            convert: {
+              directory: audioConversionData.filename
+                .replace(".mp3", "")
+                .replace(".wav", ""),
+            },
+            onlyHTML: true,
+            HTMLcontainer: audioConversionContainer,
+          })
+        ) {
           showToast({
             title: "Audio Converted 🎉",
             type: "success",
@@ -887,11 +884,32 @@ async function convertAudioToInstrument() {
 
       if (response.ok) {
         console.log("Audio converted successfully");
+        if (
+          getAudioFromFlask({
+            type: "convert",
+            convert: {
+              directory: audioConversionData.filename
+                .replace(".mp3", "")
+                .replace(".wav", ""),
+            },
+            onlyHTML: true,
+            HTMLcontainer: audioConversionContainer,
+          })
+        ) {
+          showToast({
+            title: "Audio Converted 🎉",
+            type: "success",
+            message:
+              "Audio converted successfully. You can find the converted audio in the audio conversion section.",
+            delay: 10000,
+          });
+        }
       } else {
         showToast({
           title: "Something went wrong",
           type: "error",
-          message: "Please try again later",
+          message:
+            "We were not able to connect to google host. Please try again later",
           delay: 5000,
         });
         return;
@@ -1183,19 +1201,21 @@ youtubePlayerCloseButton.addEventListener("click", () => {
 
 // ----------------- Get Audio From Flask ----------------- //
 function getAudioFromFlask(audioData) {
-  // check if onlyBlobURL and onlyHTML are both true
-  if (audioData.onlyBlobURL && audioData.onlyHTML) {
+  // ensure only one of onlyBlobURL, onlyBlob, and onlyHTML is true
+  if (audioData.onlyBlobURL + audioData.onlyBlob + audioData.onlyHTML !== 1) {
     console.error(
       "getAudioFromFlask",
-      "both onlyBlobURL and onlyHTML cannot be true"
+      "Only one of onlyBlobURL, onlyBlob, and onlyHTML can be true"
     );
     showToast({
       title: "Invalid Audio Data Configuration",
       type: "error",
       message:
-        "Cannot get audio from Flask. Both onlyBlobURL and onlyHTML cannot be true at the same time.",
+        "Cannot get audio from Flask. Only one of onlyBlobURL, onlyBlob, and onlyHTML can be true at the same time.",
       delay: 5000,
     });
+
+    return false;
   }
 
   // check if onlyHTML is true and HTML container is not provided
@@ -1207,14 +1227,72 @@ function getAudioFromFlask(audioData) {
       message: "HTML container should be provided if onlyHTML is true.",
       delay: 5000,
     });
+
+    return false;
   }
 
   // check the type of audio data
   if (audioData.type === "main") {
-    // TODO
+    // TODO, return false for now
+    return false;
   } else if (audioData.type === "stem") {
-    // TODO
+    if (!audioData.stem.directory) {
+      console.error("getAudioFromFlask", "Stem directory not provided");
+      showToast({
+        title: "Stem Directory Not Provided",
+        type: "error",
+        message: "Cannot get audio from Flask. Stem directory not provided.",
+        delay: 5000,
+      });
+
+      return false;
+    }
+
+    if (audioData.stem.getOnly) {
+    fetch(`${SERVER_IP}/load-audio?filename=${localStorage.getItem("upload_audio_cache").replace(".mp3", "").replace(".wav", "")}&filetype=stem&stemname=${audioData.stem.getOnly}`)
+      .then(response => {
+        const blob = response.blob();
+
+        if(audioData.onlyBlob){
+          return blob;
+        }
+
+        const audioUrl = URL.createObjectURL(blob);
+
+        if(audioData.onlyBlobURL){
+          return audioUrl;
+        }
+
+        if(audioData.onlyHTML){
+          // TODO, Return false for now
+          return false;
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching audio:", error);
+      });
+    } else if (audioData.stem.getAll) {
+      // TODO, return false for now
+      return false;
+    } else {
+      console.error("getAudioFromFlask", "Invalid stem data configuration");
+      showToast({
+        title: "Invalid Stem Data Configuration",
+        type: "error",
+        message:
+          "Cannot get audio from Flask. Invalid stem data configuration.",
+        delay: 5000,
+      });
+
+      return false;
+    }
   } else if (audioData.type === "convert") {
+
+    if(audioData.onlyBlob){
+      // TODO, return false for now
+      return false;
+    }
+
     if (!audioData.convert.directory) {
       console.error("getAudioFromFlask", "Convert directory not provided");
       showToast({
@@ -1223,6 +1301,7 @@ function getAudioFromFlask(audioData) {
         message: "Cannot get audio from Flask. Convert directory not provided.",
         delay: 5000,
       });
+      return false;
     }
 
     const instrument_list = ["Violin", "Flute", "Trumpet", "Saxophone"];
@@ -1233,23 +1312,23 @@ function getAudioFromFlask(audioData) {
       audioData.HTMLcontainer.innerHTML = "";
     }
 
-instrument_list.forEach(async (instrument) => {
-  const response = await fetch(
-    `${SERVER_IP}/load-audio?directory=${audioData.convert.directory}&filetype=convert&instrument=${instrument}`
-  );
+    instrument_list.forEach(async (instrument) => {
+      const response = await fetch(
+        `${SERVER_IP}/load-audio?directory=${audioData.convert.directory}&filetype=convert&instrument=${instrument}`
+      );
 
-  if (response.ok) {
-    const blob = await response.blob();
-    const audioUrl = URL.createObjectURL(blob);
+      if (response.ok) {
+        const blob = await response.blob();
+        const audioUrl = URL.createObjectURL(blob);
 
-    // add blob URL to audioUrls if onlyBlobURL is true
-    if (audioData.onlyBlobURL) {
-      audioUrls.push(audioUrl);
-    }
+        // add blob URL to audioUrls if onlyBlobURL is true
+        if (audioData.onlyBlobURL) {
+          audioUrls.push(audioUrl);
+        }
 
-    // create HTML component if onlyHTML is true
-    if (audioData.onlyHTML) {
-      const audioPLayerHTML = `<div class="col-12 mt-2 mb-2"><div class="stem-audio-container">
+        // create HTML component if onlyHTML is true
+        if (audioData.onlyHTML) {
+          const audioPLayerHTML = `<div class="col-12 mt-2 mb-2"><div class="stem-audio-container">
       <div class="stem-audio-title"> <p>${instrument}</p> </div> <div class="stem-audio-player">
       <wave-audio-path-player src="${audioUrl}" wave-width="360" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' title="">
       </wave-audio-path-player> </div> 
@@ -1257,24 +1336,26 @@ instrument_list.forEach(async (instrument) => {
       <a href="${audioUrl}" download="${instrument}.mp3"><div class="card-control-icon"> <span class="material-symbols-outlined">download</span></div></a>
       </div></div></div>`;
 
-      const htmlElement = new DOMParser().parseFromString(
-        audioPLayerHTML,
-        "text/html"
-      ).body.firstChild;
+          const htmlElement = new DOMParser().parseFromString(
+            audioPLayerHTML,
+            "text/html"
+          ).body.firstChild;
 
-      audioData.HTMLcontainer.appendChild(htmlElement);
-    }
-  } else {
-    console.error("getAudioFromFlask", "Error getting converted audio");
-    showToast({
-      title: "Error getting converted audio",
-      type: "error",
-      message:
-        "Either the file does not exist or the directory is invalid.",
-      delay: 5000,
+          audioData.HTMLcontainer.appendChild(htmlElement);
+        }
+      } else {
+        console.error("getAudioFromFlask", "Error getting converted audio");
+        showToast({
+          title: "Error getting converted audio",
+          type: "error",
+          message:
+            "Either the file does not exist or the directory is invalid.",
+          delay: 5000,
+        });
+
+        return false;
+      }
     });
-  }
-});
 
     if (audioData.onlyBlobURL) {
       return audioUrls;
@@ -1289,5 +1370,7 @@ instrument_list.forEach(async (instrument) => {
       message: "Cannot get audio from Flask. Invalid audio data type.",
       delay: 5000,
     });
+
+    return false;
   }
 }
