@@ -1544,3 +1544,20 @@ async function getAudioFromFlask(audioData) {
     return false;
   }
 }
+
+// ----------------- create new project ----------------- //
+function createNewProject(loadProject = false){
+  if(loadProject){
+    window.location.href = "http://localhost:3000/?new-project=true";
+  }
+  else{
+    let modalHTML = `<div><p>Creating new project will clear all the data in the current project. Are you sure you want to create a new project?</p></div>`;
+  showModal({
+    title: "Warning ⚠️",
+    body: modalHTML,
+    actionFunction: "createNewProject(true)",
+    autoClose: true,
+    actionButtonText: "Yes",
+  });
+  }
+}
