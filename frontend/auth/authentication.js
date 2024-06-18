@@ -21,7 +21,7 @@ export function AuthCreateAccount(name, email, password) {
 // Function to sign in with email and password
 export function AuthSignInWithEmailAndPassword(email, password) {
   return signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => ({ success: true, message: "User signed in: " + userCredential.user.email }))
+    .then((userCredential) => ({ success: true, message: "User signed in: " + userCredential.user.email , credential: userCredential}))
     .catch((error) => ({ success: false, message: "Error signing in: " + error.message }));
 }
 

@@ -48,6 +48,10 @@ const showToast = (data) => {
 
   toast.show();
 };
+// ------------------------------ Set Username ------------------------------ //
+function setUserName(username) {
+	localStorage.setItem("user_full_name", username);
+  }
 
 // ------------------------------ Animation ------------------------------ //
 const signUpButton = document.getElementById("signUp");
@@ -101,6 +105,7 @@ signUpActionButton.addEventListener("click", () => {
   AuthCreateAccount(name, email, password)
     .then((response) => {
       console.log(response);
+	  setUserName(name);
       setTimeout(() => {
         showToast({
           type: "success",
@@ -129,6 +134,7 @@ if (urlParams.has("signout")) {
   AuthSignOut()
     .then((response) => {
       console.log(response);
+	  setUserName("User");
       showToast({
         type: "info",
         title: "Signed Out",
@@ -174,7 +180,8 @@ signInActionButton.addEventListener("click", () => {
 
   AuthSignInWithEmailAndPassword(email, password)
     .then((response) => {
-      console.log(response);
+      console.log(response.credential);
+	  setUserName(response.credential.user.displayName);
       setTimeout(() => {
         showToast({
           type: "success",
