@@ -226,14 +226,8 @@ uploadAudioButton.addEventListener("click", () => {
  */
 function cacheFile(file, isRecording = false) {
   if (file) {
-    if(!isRecording) {
-      localStorage.setItem("upload_audio_cache", file.name);
-      console.log("File name cached:", file.name);
-    }
-    else{
-      localStorage.setItem("upload_audio_cache", 'recorded_audio.wav'); // 'recorded_audio.wav' is the default name for the recorded audio file
-      console.log("File name cached:", 'recorded_audio.wav');
-    }
+    localStorage.setItem("upload_audio_cache", file.name);
+    console.log("File name cached:", file.name);
   } else {
     console.log("CRASH: No file selected.");
     showToast({
@@ -304,20 +298,18 @@ const showToast = (data) => {
   toast.show();
 };
 
-
 // ----------------- New Project ----------------- //
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
   const queryParams = new URLSearchParams(window.location.search);
 
-  if (queryParams.get('new-project') === 'true') {
-      const button = document.getElementById('main-function-button');
+  if (queryParams.get("new-project") === "true") {
+    const button = document.getElementById("main-function-button");
 
-      if (button) {
-          button.click();
-      }
+    if (button) {
+      button.click();
+    }
   }
 });
-
 
 // ----------------- Audio Recording ----------------- //
 let isRecording = false;
@@ -331,7 +323,7 @@ const recordAudioButtonText = document.getElementById("record-audio-text");
 const recordAudio = () =>
   new Promise(async (resolve) => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
+    const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
     const audioChunks = [];
     mediaRecorder.addEventListener("dataavailable", (event) => {
       audioChunks.push(event.data);
@@ -342,14 +334,36 @@ const recordAudio = () =>
     const stop = () =>
       new Promise((resolve) => {
         mediaRecorder.addEventListener("stop", () => {
-          const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-          recordAudioUrl = URL.createObjectURL(audioBlob);
-          file = new File([audioBlob], "recorded_audio.wav", {
-            type: "audio/wav",
-            lastModified: Date.now()
-          });
-          console.log('file', file)
-          resolve({ audioBlob, recordAudioUrl});
+          const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+    
+          // Convert the audioBlob to an ArrayBuffer
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const arrayBuffer = reader.result;
+    
+            // Create a new AudioContext and decode the audio data
+            const audioContext = new AudioContext();
+            audioContext.decodeAudioData(arrayBuffer).then((decodedData) => {
+              // Calculate the duration in seconds
+              const duration = decodedData.duration;
+    
+              // Create a new Blob object with the duration metadata
+              const audioOptions = {
+                type: "audio/webm",
+                lastModified: Date.now(),
+              };
+              const durationMetadata = { duration: duration };
+              const combinedOptions = { ...audioOptions, ...durationMetadata };
+              const finalBlob = new Blob([audioBlob], combinedOptions);
+    
+              file = new File([finalBlob], "recorded_audio.webm", combinedOptions);
+              recordAudioUrl = URL.createObjectURL(finalBlob);
+    
+              console.log("file", file);
+              resolve({ finalBlob, recordAudioUrl });
+            });
+          };
+          reader.readAsArrayBuffer(audioBlob);
         });
         mediaRecorder.stop();
       });
@@ -358,7 +372,6 @@ const recordAudio = () =>
   });
 
 const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
-
 
 const startRecording = async () => {
   const recording = await recordAudio();
@@ -371,7 +384,7 @@ const startRecording = async () => {
     delay: 5000,
   });
 
-  while (isRecording == true) {
+  while (isRecording) {
     await sleep(1);
   }
 
@@ -384,19 +397,22 @@ const startRecording = async () => {
     message: "Recording has stopped. You can listen to the recording now.",
     delay: 5000,
   });
+
   cacheFile(file, true);
-  const recordAudioContainer = document.getElementById("record-audio-container");
+
+  const recordAudioContainer = document.getElementById(
+    "record-audio-container"
+  );
   recordAudioContainer.innerHTML = `<wave-audio-path-player src="${recordAudioUrl}" wave-width="400" wave-height="80" color="#55007f" wave-options='{"animation":true,"samples":100, "type": "wave"}' id="main-audio-player" title=""></wave-audio-path-player>`;
 };
 
 recordAudioButton.addEventListener("click", (e) => {
   if (isRecording) {
-      isRecording = false;
-      recordAudioButtonText.textContent = "Start Recording";
-      recordAudioButton.classList.remove("light-red-bgcolor");
-      recordAudioButton.classList.add("light-green-bgcolor");
-
-  } else{
+    isRecording = false;
+    recordAudioButtonText.textContent = "Start Recording";
+    recordAudioButton.classList.remove("light-red-bgcolor");
+    recordAudioButton.classList.add("light-green-bgcolor");
+  } else {
     isRecording = true;
     recordAudioButtonText.textContent = "Stop Recording";
     recordAudioButton.classList.remove("light-green-bgcolor");
@@ -404,5 +420,3 @@ recordAudioButton.addEventListener("click", (e) => {
     startRecording();
   }
 });
-
-console.log(isRecording);
