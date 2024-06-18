@@ -51,7 +51,9 @@ let WARNINGS = {
 const SERVER_IP = "http://localhost:5000";
 
 //----------------- DOM Elements -----------------//
-
+const navbar = document.querySelector(".nav-container");
+const NavbarLinks = document.querySelectorAll(".nav-link");
+const heroSection = document.querySelector(".hero-section");
 const toastContainer = document.getElementById("main-toast-container");
 const modalContainer = document.getElementById("main-modal-container");
 const welcomeTitle = document.querySelector("#welcome-title");
@@ -82,6 +84,108 @@ const youtubePlayerCloseButton = document.getElementById("iframe-close-button");
 const youtubeVideoContainer = document.getElementsByClassName(
   "youtube-mini-player-container"
 )[0];
+
+
+// ----------------- Navbar Link Hover Event Listeners ----------------- //
+
+/**
+ * This script adds mouse event listeners to each link in the navigation bar.
+ *
+ * For each link in the navigation bar (NavbarLinks), two event listeners are added:
+ *
+ * 1. "mouseenter": This event is triggered when the mouse pointer enters the link area.
+ *    When this event is triggered, the `mouseHovering` function is called with a string
+ *    argument in the format "enter-{navid}", where "{navid}" is the ID of the navigation
+ *    link as specified in the link's "data-navid" attribute.
+ *
+ * 2. "mouseleave": This event is triggered when the mouse pointer leaves the link area.
+ *    When this event is triggered, the `mouseHovering` function is called with a string
+ *    argument in the format "exit-{navid}", where "{navid}" is the ID of the navigation
+ *    link as specified in the link's "data-navid" attribute.
+ *
+ * The `mouseHovering` function is expected to handle these events appropriately,
+ * such as by changing the appearance of the navigation link to indicate that it is
+ * being hovered over.
+ */
+NavbarLinks.forEach((link) => {
+  link.addEventListener("mouseenter", () =>
+    mouseHovering(`enter-${link.dataset.navid}`)
+  );
+  link.addEventListener("mouseleave", () =>
+    mouseHovering(`exit-${link.dataset.navid}`)
+  );
+});
+
+// ----------------- Navbar Auto Expand Animation ----------------- //
+/**
+ * This function controls the appearance of the navigation bar based on the intersection
+ * between the target element and its root container (viewport or a specified element).
+ *
+ * It takes an array of IntersectionObserverEntry objects as an argument. Each entry
+ * represents a change in the intersection status of a target element.
+ *
+ * For each entry:
+ *
+ * 1. If the target element is intersecting with the root container (i.e., it's visible
+ *    within the viewport or the specified element), the function adds the "nav-expand"
+ *    class to the navigation bar. This could, for example, expand the navigation bar or
+ *    make it fully visible.
+ *
+ * 2. If the target element is not intersecting with the root container (i.e., it's not
+ *    visible within the viewport or the specified element), the function removes the
+ *    "nav-expand" class from the navigation bar. This could, for example, collapse the
+ *    navigation bar or make it partially visible.
+ *
+ * This function is typically used as the callback function for an IntersectionObserver,
+ * which watches for changes in the intersection between the target element and its root
+ * container.
+ */
+const controlNavbar = (entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      navbar.classList.add("nav-expand");
+    } else {
+      navbar.classList.remove("nav-expand");
+    }
+  });
+};
+
+// ----------------- Navbar Link Hover Animation ----------------- //
+/**
+ * This function changes the background color of the navigation bar and the body of the
+ * document based on the navigation link being hovered over.
+ *
+ * It takes a string argument in the format "{action}-{navid}", where "{action}" is
+ * either "enter" or "exit" and "{navid}" is the ID of the navigation link.
+ *
+ * If "{action}" is "enter", this means that the mouse pointer has entered the area of
+ * the navigation link. The function changes the background color of the navigation bar
+ * and the body of the document to the color specified by the CSS variable
+ * "--nav-{navid}-background-color".
+ *
+ * If "{action}" is "exit", this means that the mouse pointer has left the area of the
+ * navigation link. The function changes the background color of the navigation bar to
+ * the color specified by the CSS variable "--nav-default-background-color" and the
+ * background color of the body of the document to "#f6f3f3".
+ *
+ * This function is typically used as the callback function for mouse event listeners
+ * added to the navigation links.
+ */
+const mouseHovering = (link) => {
+  if (link.split("-")[0] === "enter") {
+    navbar.style.background = `var(--nav-${
+      link.split("-")[1]
+    }-background-color)`;
+    document.body.style.background = `var(--nav-${
+      link.split("-")[1]
+    }-background-color)`;
+  } else {
+    navbar.style.background = "var(--nav-default-background-color)";
+    document.body.style.background = "#f6f3f3";
+  }
+};
+const observer = new IntersectionObserver(controlNavbar);
+observer.observe(heroSection);
 
 // ----------------- YouTube Mini Player ----------------- //
 youtubeVideoContainer.style.display = "none";

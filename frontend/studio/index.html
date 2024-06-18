@@ -41,6 +41,32 @@
   </head>
 
   <body>
+    <nav>
+      <div class="nav-container">
+          <div class="nav-title-container">
+              <a href="#" class="nav-brand">Alchemizer AI</a>
+          </div>
+          <div class="nav-list-container">
+              <ul class="nav-list">
+                  <li class="nav-item">
+                      <!-- <a href="#" class="nav-link" onmouseenter="mouseHovering('enter-home')"
+                          onmouseleave="mouseHovering('leave-home')" data-bs-toggle="popover" data-bs-trigger="hover"
+                          data-bs-placement="bottom" data-bs-content="currently at home">Home</a> -->
+                      <a href="#" class="nav-link" data-navid="home">Home</a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="studio/" class="nav-link" data-navid="studio">Studio</a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="#link-about-section" class="nav-link" data-navid="about">About</a>
+                  </li>
+                  <!-- <li class="nav-item">
+                      <a href="contact.html" class="nav-link" data-navid="contact">Contact</a>
+                  </li> -->
+              </ul>
+          </div>
+      </div>
+  </nav>
     <div class="hero-section" style="padding-bottom: 100px">
       <div class="container">
         <div class="row">
@@ -213,8 +239,7 @@
               <span>Search</span> Songs
             </p>
             <p style="margin-right: 100px">
-              Search songs easily with the search bar. You can play them
-              directly here
+              Listen to your favorite songs or search for inspiration for your new project.
             </p>
           </div>
           <div class="col-6">
@@ -255,10 +280,10 @@
         </div>
       </div>
     </div>
-    <div class="youtube-mini-player-container draggable">
+    <div class="youtube-mini-player-container draggable" style="display: none;">
       <div class="hs-responsive-embed-youtube">
         <iframe
-          src="https://www.youtube.com/embed/4z2PyfaoiYk?rel=0&amp;showinfo=0"
+          src=""
           frameborder="0"
           allowfullscreen=""
           id="youtube-video-iframe"

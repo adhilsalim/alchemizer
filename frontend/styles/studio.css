@@ -26,6 +26,12 @@
   --search-result-font-bold: 700;
   --search-result-z-tooltip: 10;
   --search-result-z-fixed: 100;
+
+  --nav-home-background-color: rgb(209, 255, 183);
+  --nav-studio-background-color: rgb(183, 255, 250);
+  --nav-about-background-color: rgb(255, 183, 251);
+  --nav-contact-background-color: rgb(255, 239, 183);
+  --nav-default-background-color: rgba(255, 255, 255, 0.75);
 }
 
 @media screen and (min-width: 1150px) {
@@ -52,6 +58,89 @@ body {
 
 h1 {
   font-weight: bold;
+}
+
+nav {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-home-background-color {
+  background: rgba(208, 2, 27, 0.25);
+}
+
+.nav-container {
+  background: var(--nav-default-background-color);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(3.5px);
+  -webkit-backdrop-filter: blur(3.5px);
+  border-radius: 60px;
+  margin: 10px;
+  padding: 10px;
+  overflow: hidden;
+  position: fixed;
+  top: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: 1000;
+  width: auto;
+  height: 50px;
+  max-width: 140px;
+  -webkit-transition: max-width 0.5s;
+  transition: max-width 0.5s ease-in-out;
+}
+
+.nav-expand {
+  max-width: 400px;
+}
+
+.nav-title-container {
+  white-space: nowrap;
+  padding: 0px;
+  margin: 0px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.nav-title-container a {
+  text-decoration: none;
+  background: linear-gradient(to right, #8500ff 0%, #de00ff 100%);
+  background-clip: text; /* Standard property */
+  -webkit-background-clip: text; /* WebKit browsers */
+  color: transparent;
+  font-family: "Noto Sans Khojki", sans-serif;
+  font-weight: 700;
+  padding: 0px;
+  margin: 0px;
+}
+
+.nav-container:hover {
+  max-width: 400px;
+}
+
+.nav-list-container {
+  white-space: nowrap;
+  padding: 0px;
+  margin: 0px;
+}
+
+.nav-list {
+  padding: 0px;
+  margin: 0px;
+  margin-left: 20px;
+}
+
+.nav-list li {
+  list-style-type: none;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.nav-item:hover {
+  color: #484444;
 }
 
 .hero-section {
