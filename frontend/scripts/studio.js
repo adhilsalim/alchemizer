@@ -41,7 +41,7 @@ let selectedStems = "2stems";
 let selectedInstrument = "violin";
 let selectedConversionMode = "WebGL";
 let audioConversionData = null;
-let isLoggedIn = true;
+// let isLoggedIn = true;
 let WARNINGS = {
   audioSeparationFileExists: false,
   audioSeparationInProgress: false,
@@ -358,7 +358,11 @@ function showModal(data) {
 
 separateAudioButton.addEventListener("click", () => {
   console.log("Separate Audio Clicked");
-  if (!isLoggedIn) {
+  console.log('The user is not logged in ', localStorage.getItem("isLoggedIn") == "logout");
+
+  // return;
+
+  if ((localStorage.getItem("isLoggedIn") == "logout")){
     window.location.href = "http://localhost:3000/auth";
     return;
   }
@@ -771,7 +775,7 @@ function setUserName(username) {
 // ----------------- Convert Audio Button Event Listener ----------------- //
 convertAudioButton.addEventListener("click", () => {
   console.log("Convert Audio Clicked");
-  if (!isLoggedIn) {
+  if ((localStorage.getItem("isLoggedIn") == "logout")){
     window.location.href = "http://localhost:3000/auth";
     return;
   }
